@@ -1,0 +1,5 @@
+start
+vertice: 4: pai:-1 nivel:0
+vertice: 1084168: pai:4 nivel:1
+vertice: 1072255: pai:4 nivel:1
+vertice: 1005350: pai:4 nivel:1
