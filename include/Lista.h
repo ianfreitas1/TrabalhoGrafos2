@@ -15,8 +15,8 @@ class Lista : public Grafo{
         vector<int> vizinhos(int v);
         vector<int> BFS(int raiz);
         vector<bool> DFS(int raiz);
-
-
+        void CC();
+        void Grau2();
       //  ListInfo** getLista();
 
     protected:

@@ -17,8 +17,10 @@ int main(){
   cin >> arquivo;
   cout << "Carregando..." << endl;
   Lista lista = Lista(arquivo);
+  lista.Grau2();
+  //lista.CC();
   //lista.vizinhos(0);
-  lista.DFS(2);
+  //lista.DFS(1);
   //lista.vizinhos(2);
   //vector<int> x = lista.BFS(3);
   system("pause");

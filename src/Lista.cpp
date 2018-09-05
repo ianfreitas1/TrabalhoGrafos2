@@ -7,9 +7,13 @@
 #include <stack>
 #include <queue>
 #include <ctime>
+#include <stdlib.h>
+#include <algorithm>
 
 using namespace std;
 
+//Construtor da lista que adiciona todas as arestas de um grafo
+//e retorna o numero de vertices e arestas
 Lista::Lista(string path){
     ifstream myFile;
     myFile.open(path);
@@ -43,6 +47,7 @@ Lista::Lista(string path){
 
 }
 
+//Adiciona aresta na lista de adjacencia
 void Lista::addAresta(int v0, int vf){
   ListInfo* vizinho = new ListInfo;                     //Nao precisa adicionar no m_pLista[vf] , porque chama o addAresta 2 vezes na leitura
   vizinho->vertice = vf;
@@ -55,6 +60,7 @@ void Lista::addAresta(int v0, int vf){
 
 }
 
+//Retorna os vizinhos de um vertice v, sendo vertice inicial igual a 0
 vector<int> Lista::vizinhos(int v){
   vector<int> vizinhos;
   ListInfo* pCrawl = new ListInfo;
@@ -69,6 +75,7 @@ vector<int> Lista::vizinhos(int v){
   return vizinhos;
 }
 
+//Retorna o vetor de explorados na BFS
 vector<int> Lista::BFS(int raiz) {
 
 //clock_t begin = clock();
@@ -114,18 +121,17 @@ myOut << "start" << endl;
 }
 
 
-
+/*
 void Lista::Grau(){
-  vector<int> vetorGrau = {0,10000000,0};
+  vector<int> vetorGrau = {0,100000000,0};
   int count = 0;
   ListInfo* aux = new ListInfo;
   int avg = 0;
-  for (int i=1;i<m_numVertices;i++){
+  for (int i=1;i<=m_numVertices;i++){
     aux = m_pLista[i]->pNext;
     while(aux != NULL){
       aux = aux->pNext;
       count++;
-
     }
     avg = avg + count;
     if (count > vetorGrau[0]) {vetorGrau[0] = count+1;}
@@ -139,8 +145,47 @@ void Lista::Grau(){
   myOut << "GrauMedio: " <<   (avg/m_numVertices)+1 << endl;
   // myOut << "GrauMediana: " << vetorGrau[3] << endl;
   myOut.close();
+}*/
+
+// Funcao que retorna os graus máximo, minimo, medio e mediana
+void Lista::Grau2(){
+  //Vetor de comparação para achar os graus máximo e mínimo
+  vector<int> vetorGrau = {0, 10000000, 0};
+  //Vetor que guarda todos os graus
+  vector<int> graus(m_numVertices, 0);
+  int count, avg = 0;
+  int mediana;
+  //Percorre todos os vertices, achando seus respectivos graus
+  //Caso o vértice que está sendo analisado tenha maior grau do que o atual
+  //maior grau no vetor de comparação, atualiza o vetor. O mesmo para o menor
+  for (int i = 1; i<=m_numVertices;i++){
+    vector<int> w = vizinhos(i-1);
+    count = w.size();
+    graus[i-1] = count;
+    if (count > vetorGrau[0]) {vetorGrau[0] = count;}
+    if (count < vetorGrau[1]) {vetorGrau[1] = count;}
+    avg += count;
+  }
+  //Ordena o vetor com todos os graus e acha a mediana
+  sort(graus.begin(), graus.end());
+  if (m_numVertices%2){
+    mediana = graus[m_numVertices/2];
+  }else
+  {
+    mediana = (graus[m_numVertices/2] + graus[m_numVertices/2+1])/2;
+  }
+
+  //Escreve no arquivo de saida todas as informações
+  ofstream myOut;
+  myOut.open (m_savePath + "/grau.txt");
+  myOut << "GrauMax: " << vetorGrau[0] << endl;
+  myOut << "GrauMin:" << vetorGrau[1] << endl;
+  myOut << "GrauMedio: " <<   (avg*1.0/m_numVertices) << endl;
+  myOut << "GrauMediana: " << mediana << endl;
+  myOut.close();
 }
 
+//Retorna o vetor de visitados da BFS a partir de um vértice indicado
 vector<bool> Lista::DFS(int raiz) {
 
 	int s = raiz-1;
@@ -186,8 +231,34 @@ vector<bool> Lista::DFS(int raiz) {
 	return visitado;
 }
 
+void Lista::CC(){
+  vector<bool> marcado(m_numVertices,0);
+  vector<int> num_Componente;
+  int totalComponentes = 0;
+  //int componenteMarcada = 1;
+  ofstream myOut;
+  myOut.open (m_savePath + "/CC.txt");
+
+  for (int i = 0; i < m_numVertices; i++){
+    if (marcado[i] == 0){
+        DFS(i);
+        totalComponentes++;
+        num_Componente.resize(totalComponentes);
+        num_Componente[totalComponentes] = DFS(i).size();
+        for (int j = 0; j < m_numVertices; j++){
+            if (DFS(i)[j]==1){
+                vector<int> componenteAtual(DFS(i).size());
+                componenteAtual[j] = DFS(i)[j];
+                myOut << "Componente " << totalComponentes << ": " << componenteAtual[j] << ", ";
+                //componenteMarcada++;
+  }
+        }
+      }
+    }
+  }
 
 
+//Destrutor da lista
 Lista::~Lista(){
     ListInfo* aux;
     for(int i=1;i<=m_numVertices;i++){
