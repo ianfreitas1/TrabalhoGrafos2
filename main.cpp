@@ -16,7 +16,7 @@ int main(){
   cin >> arquivo;
   cout << "Carregando..." << endl;
   Matriz matriz = Matriz(arquivo);
-  matriz.Grau2();
+  matriz.DFS(1);
   //int vizin;
   //cin >> vizin;
   //matriz.vizinhos(1);

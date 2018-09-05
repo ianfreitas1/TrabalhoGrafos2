@@ -7,6 +7,8 @@
 #include <vector>
 #include <stdlib.h>
 #include <algorithm>
+#include <stack>
+#include <queue>
 
 using namespace std;
 
@@ -137,6 +139,52 @@ void Matriz::Grau2(){
   myOut << "GrauMedio: " <<   (avg*1.0/m_numVertices) << endl;
   myOut << "GrauMediana: " << mediana << endl;
   myOut.close();
+}
+
+//Retorna o vetor de visitados da BFS a partir de um vértice indicado
+vector<bool> Matriz::DFS(int raiz) {
+
+	int s = raiz;
+	// Initialize vectors and stack
+	vector<bool> visitado(m_numVertices,0);
+	vector<int> pai(m_numVertices,-1);
+	vector<int> nivel(m_numVertices,-1);
+	stack<int> pilha;
+  //vector<int> explorado;
+
+  ofstream myOut;
+  myOut.open (m_savePath + "/DFS.txt");
+  myOut << "start" << endl;
+
+	//visitado[s] = 1;
+	nivel[s] = 0;
+	pilha.push(s);
+  //myOut << "Vertice: " << s << ", Nivel: " << nivel[s] << ", Pai: " << pai[s] << endl;
+	cout << endl<< "DFS(" << raiz << ") Running..." << endl;
+	while(!pilha.empty()) {
+		int v = pilha.top();
+		pilha.pop();
+    if (visitado[v]==0){
+      myOut << "Vertice: " << v << ", Nivel: " << nivel[v] << ", Pai: " << pai[v] << endl;
+      visitado[v]=1;
+      vector<int> w = vizinhos(v);
+      for(int i = 0; i < w.size();i++){
+        pilha.push(w[i]);
+          //pai[w[i]-1] = v;
+          //nivel[w[i]-1] = nivel[v]+1;
+          //visitado[w[i]-1] = 1;
+          int n = pilha.top();
+          pai[n] = v;
+          nivel[n] = nivel[v] + 1;
+    }
+  }
+}
+  // explorado.push_back(v);
+  //}
+  //for(int i=0;i<explorado.size();i++){
+  //  myOut << "vertice: "<< explorado[i] << ": pai:"<< pai[explorado[i]] << " nivel:" << nivel[explorado[i]] << endl;
+  //}
+	return visitado;
 }
 
 Matriz::~Matriz(){

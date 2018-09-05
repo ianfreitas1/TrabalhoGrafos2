@@ -19,6 +19,7 @@ class Matriz : public Grafo{
         void Grau();
         vector<int> vizinhos(int v);
         void Grau2();
+        vector<bool> DFS(int raiz);
     protected:
 				//void iniciaMatriz(int m_numVertices);
         void addAresta(int v0,int vf);
