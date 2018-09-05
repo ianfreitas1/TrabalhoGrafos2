@@ -187,6 +187,51 @@ vector<bool> Matriz::DFS(int raiz) {
 	return visitado;
 }
 
+//Retorna o vetor de explorados na BFS
+vector<int> Matriz::BFS(int raiz) {
+
+//clock_t begin = clock();
+ofstream myOut;
+myOut.open (m_savePath + "/BFS.txt");
+myOut << "start" << endl;
+
+
+	int s = raiz;
+	vector<bool> visitado(m_numVertices,0);
+	vector<int> pai(m_numVertices,-1);
+	vector<int> nivel(m_numVertices,-1);
+	vector<int> explorado;
+	queue<int> fila;
+
+	visitado[s] = 1;
+	nivel[s] = 0;
+	fila.push(s);
+
+	cout << endl<< "BFS(" << raiz << ") Running..." << endl;
+
+	while(!fila.empty()){
+		int v = fila.front();
+		fila.pop();
+    vector<int> w = vizinhos(v);
+    //cout << w.size() << endl;
+    for(int i = 0;i< w.size();i++){
+      if(visitado[w[i]] == 0) {
+        visitado[w[i]] = 1;
+        pai[w[i]] = v;
+        nivel[w[i]] = nivel[v]+1;
+        fila.push(w[i]);
+        }
+      }
+    //cout << v << endl;
+    //cout << v << endl;
+    explorado.push_back(v);
+  }
+  for(int i=0;i<explorado.size();i++){
+    myOut << "vertice: "<< explorado[i] << ": pai:"<< pai[explorado[i]] << " nivel:" << nivel[explorado[i]] << endl;
+  }
+  return explorado;
+}
+
 Matriz::~Matriz(){
   for(int i=0;i<m_numVertices;i++){
          delete[] m_Matriz[i];
