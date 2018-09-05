@@ -10,14 +10,18 @@
 using namespace std;
 
 int main(){
-  //Matriz matriz = Matriz("dblp.txt");
-  //matriz.Grau();
+
   string arquivo;
   cout << "nome do arquivo: " << endl;
   cin >> arquivo;
   cout << "Carregando..." << endl;
-  Lista lista = Lista(arquivo);
-  lista.Grau2();
+  Matriz matriz = Matriz(arquivo);
+  matriz.Grau2();
+  //int vizin;
+  //cin >> vizin;
+  //matriz.vizinhos(1);
+  //Lista lista = Lista(arquivo);
+  //lista.Grau2();
   //lista.CC();
   //lista.vizinhos(0);
   //lista.DFS(1);

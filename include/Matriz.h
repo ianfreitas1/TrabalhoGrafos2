@@ -17,6 +17,8 @@ class Matriz : public Grafo{
         Matriz(std::string path);
         ~Matriz();
         void Grau();
+        vector<int> vizinhos(int v);
+        void Grau2();
     protected:
 				//void iniciaMatriz(int m_numVertices);
         void addAresta(int v0,int vf);
