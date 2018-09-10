@@ -258,77 +258,51 @@ vector<bool> Lista::DFS(int raiz) {
 }
 
 
-//Funcao para achar as componentes conexas de um grafo. Ainda está incorreta
+//Funcao para achar as componentes conexas de um grafo.
 void Lista::CC(){
-  //Vetor que se refere ao numero da componente
-  vector<int> id(m_numVertices, -1);
-  //Vetor de visitados
-  vector<bool> visitado(m_numVertices, 0);
-  //Pilha da DFS
-  stack<int> pilha;
-  //Contador de componentes
+  //Vetor de ids, que se referem ao numero da componente conexa que o vértice
+  //pertence
+  vector<int> id(m_numVertices+1, -1);
+
+  //Variável contadora de componentes
   int count = 0;
 
-
-  //Inicia arquivo de saída
+  //Criação do arquivo de saída
   ofstream myOut;
   myOut.open (m_savePath + "/CC.txt");
-  //DFS atualiza o id do vértice e aumenta o número de componentes
-  for (int i = 0; i < m_numVertices; i++){
-    if (id[i] == -1){
-      pilha.push(i);
-      while (!pilha.empty()){
-        int v = pilha.top();
-        pilha.pop();
-        if (visitado[v]==0){
-          visitado[v]=1;
-          vector<int> w = vizinhos(v);
-          for(int i = 0; i < w.size();i++){
-            pilha.push(w[i]-1);
-            int n = pilha.top();
-            //Atualizando id do vértice
-            id[n] = count;
-            }
-          }
-      }
-      //Aumentando número de componentes
-      count++;
-    }
 
-  }
-  //Escreve número de componentes no arquivo de saída
-  myOut << "Numero de componentes: " << count << endl;
-  //Variavel auxiliar
-  int aux = 0;
-  //Vetor de vetores para salvar as componentes
+  //Vetor de vetores que guarda todas as componentes
   vector< vector<int> > componentes;
 
-  //Loop que adiciona no vetor de vetores cada componente
-  while (componentes.size() != count){
-    //Vetor temporario que recebe uma componente
-    vector<int> temp;
-    for (int i = 0; i < m_numVertices; i++){
-      //Se o id do vértice é igual a variavel auxiliar, adiciona o vértice
-      //em temp, ou seja, adiciona todos os vértices com mesma id no vetor
-      if (id[i] == aux){
-        temp.push_back(i);
+  //Loop principal
+  for (int i = 1; i <= m_numVertices; i++){
+    //Se o id for -1, significa que o vértice ainda nao foi encontrado
+    //Nesse caso, roda uma BFS e adiciona o vetor de explorados retornado por essa
+    //BFS no vetor de vetores componentes. Depois atualiza o id dos vértices
+    //marcados e incrementa o contador de componentes
+    if (id[i-1] == -1){
+      vector<int> temp = BFS(i);
+      sort(temp.begin(), temp.end());
+      componentes.push_back(temp);
+      for (int j = 0; j<temp.size();j++){
+        id[temp[j]] = count;
       }
+    count++;
     }
-    //Adiciona temp no vetor de componentes
-    componentes.push_back(temp);
-    //Incrementa variavel auxiliar para verificação do id
-    aux++;
   }
 
-  //Loop de escrita de cada componente no arquivo de saída
+  //Escrita do número de componentes
+  myOut << "Numero de componentes: " << count << endl;
+
+  //Escrita de cada componente e seus respectivos vértices
   for (int i = 0; i < componentes.size();i++){
     myOut << "Componente " << i+1 << ": ";
     for (int j = 0; j < componentes[i].size();j++){
-       myOut << componentes[i][j] + 1 << ", ";
+       myOut << componentes[i][j]+1 << ", ";
     }
     myOut << endl;
   }
-  }
+}
 
 
 //Destrutor da lista
