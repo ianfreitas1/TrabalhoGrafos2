@@ -219,7 +219,6 @@ vector<bool> Lista::DFS(int raiz) {
 	vector<int> pai(m_numVertices,-1);
 	vector<int> nivel(m_numVertices,-1);
 	stack<int> pilha;
-  //vector<int> explorado;
 
   //Inicio do arquivo de saída
   ofstream myOut;
@@ -227,11 +226,10 @@ vector<bool> Lista::DFS(int raiz) {
   myOut << "start" << endl;
 
 	//visitado[s] = 1;
-
+  //int count;
   //Atribui a raiz nivel 0 e o insere na pilha
 	nivel[s] = 0;
 	pilha.push(s);
-  //myOut << "Vertice: " << s << ", Nivel: " << nivel[s] << ", Pai: " << pai[s] << endl;
   cout << endl<< "DFS(" << raiz << ") Rodando..." << endl;
 
   //Loop principal da DFS que percorre a pilha enquanto ela não estiver vazia.
@@ -248,20 +246,12 @@ vector<bool> Lista::DFS(int raiz) {
       vector<int> w = vizinhos(v);
       for(int i = 0; i < w.size();i++){
         pilha.push(w[i]-1);
-          //pai[w[i]-1] = v;
-          //nivel[w[i]-1] = nivel[v]+1;
-          //visitado[w[i]-1] = 1;
           int n = pilha.top();
           pai[n] = v;
           nivel[n] = nivel[v] + 1;
+        }
+      }
     }
-  }
-}
-  // explorado.push_back(v);
-  //}
-  //for(int i=0;i<explorado.size();i++){
-  //  myOut << "vertice: "<< explorado[i] << ": pai:"<< pai[explorado[i]] << " nivel:" << nivel[explorado[i]] << endl;
-  //}
 
   //Retorno do vetor visitados
 	return visitado;
@@ -270,29 +260,74 @@ vector<bool> Lista::DFS(int raiz) {
 
 //Funcao para achar as componentes conexas de um grafo. Ainda está incorreta
 void Lista::CC(){
-  vector<bool> marcado(m_numVertices,0);
-  vector<int> num_Componente;
-  int totalComponentes = 0;
-  //int componenteMarcada = 1;
+  //Vetor que se refere ao numero da componente
+  vector<int> id(m_numVertices, -1);
+  //Vetor de visitados
+  vector<bool> visitado(m_numVertices, 0);
+  //Pilha da DFS
+  stack<int> pilha;
+  //Contador de componentes
+  int count = 0;
+
+
+  //Inicia arquivo de saída
   ofstream myOut;
   myOut.open (m_savePath + "/CC.txt");
-
+  //DFS atualiza o id do vértice e aumenta o número de componentes
   for (int i = 0; i < m_numVertices; i++){
-    if (marcado[i] == 0){
-        DFS(i);
-        totalComponentes++;
-        num_Componente.resize(totalComponentes);
-        num_Componente[totalComponentes] = DFS(i).size();
-        for (int j = 0; j < m_numVertices; j++){
-            if (DFS(i)[j]==1){
-                vector<int> componenteAtual(DFS(i).size());
-                componenteAtual[j] = DFS(i)[j];
-                myOut << "Componente " << totalComponentes << ": " << componenteAtual[j] << ", ";
-                //componenteMarcada++;
+    if (id[i] == -1){
+      pilha.push(i);
+      while (!pilha.empty()){
+        int v = pilha.top();
+        pilha.pop();
+        if (visitado[v]==0){
+          visitado[v]=1;
+          vector<int> w = vizinhos(v);
+          for(int i = 0; i < w.size();i++){
+            pilha.push(w[i]-1);
+            int n = pilha.top();
+            //Atualizando id do vértice
+            id[n] = count;
+            }
+          }
+      }
+      //Aumentando número de componentes
+      count++;
+    }
+
   }
-        }
+  //Escreve número de componentes no arquivo de saída
+  myOut << "Numero de componentes: " << count << endl;
+  //Variavel auxiliar
+  int aux = 0;
+  //Vetor de vetores para salvar as componentes
+  vector< vector<int> > componentes;
+
+  //Loop que adiciona no vetor de vetores cada componente
+  while (componentes.size() != count){
+    //Vetor temporario que recebe uma componente
+    vector<int> temp;
+    for (int i = 0; i < m_numVertices; i++){
+      //Se o id do vértice é igual a variavel auxiliar, adiciona o vértice
+      //em temp, ou seja, adiciona todos os vértices com mesma id no vetor
+      if (id[i] == aux){
+        temp.push_back(i);
       }
     }
+    //Adiciona temp no vetor de componentes
+    componentes.push_back(temp);
+    //Incrementa variavel auxiliar para verificação do id
+    aux++;
+  }
+
+  //Loop de escrita de cada componente no arquivo de saída
+  for (int i = 0; i < componentes.size();i++){
+    myOut << "Componente " << i+1 << ": ";
+    for (int j = 0; j < componentes[i].size();j++){
+       myOut << componentes[i][j] + 1 << ", ";
+    }
+    myOut << endl;
+  }
   }
 
 
