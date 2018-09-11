@@ -310,7 +310,9 @@ void Matriz::CC(){
     count++;
     }
   }
-
+  //Ordena vetor de componentes do maior tamanho para o menor
+  sort(componentes.begin(), componentes.end(), [](const vector<int> & a, const vector<int> & b){ return a.size() > b.size(); });
+  
   //Escrita do número de componentes
   myOut << "Numero de componentes: " << count << endl;
 
