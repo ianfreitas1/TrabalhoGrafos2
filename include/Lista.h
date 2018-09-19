@@ -12,7 +12,7 @@ class Lista : public Grafo{
         Lista(std::string path);
         ~Lista();
         void Grau();
-        vector<int> vizinhos(int v);
+        vector<tuple<int, float> > vizinhos(int v);
         vector<int> BFS(int raiz);
         vector<bool> DFS(int raiz);
         void CC();
@@ -21,7 +21,7 @@ class Lista : public Grafo{
 
     protected:
         ListInfo** m_pLista;
-        void addAresta(int v0,int vf);
+        void addAresta(int v0,int vf, float peso);
         //std::string m_path;
 
 

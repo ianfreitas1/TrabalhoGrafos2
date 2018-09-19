@@ -26,6 +26,7 @@ int main(){
   cout << "2: BFS" << endl;
   cout << "3: DFS" << endl;
   cout << "4: CC" << endl;
+  cout << "5: Vizinhos" << endl;
   cin >> opcao;
   switch(opcao){
     case 1:
@@ -33,7 +34,7 @@ int main(){
       break;
     case 2:
       int i;
-      cout << "Escolha vértice da BFS: ";
+      cout << "Escolha vertice da BFS: ";
       cin >> i;
       lista.BFS(i);
       break;
@@ -45,6 +46,12 @@ int main(){
       break;
     case 4:
       lista.CC();
+      break;
+    case 5:
+      int k;
+      cout << "Escolha vertice para mostrar vizinhos: ";
+      cin >> k;
+      lista.vizinhos(k);
       break;
   }
   //lista.Grau2();

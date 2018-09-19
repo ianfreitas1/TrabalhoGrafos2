@@ -9,6 +9,7 @@
 #include <ctime>
 #include <stdlib.h>
 #include <algorithm>
+#include <tuple>
 
 using namespace std;
 
@@ -33,10 +34,11 @@ Lista::Lista(string path){
     while(getline(myFile, s)){
       if(s.empty() == false){
         istringstream tmp(s);                         //Leitura de Arquivo
-        int v0 ,vf;
-        tmp >> v0 >> vf;
-        this->addAresta(v0, vf);
-        this->addAresta(vf, v0);
+        int v0, vf;
+        float peso = 1;
+        tmp >> v0 >> vf >> peso;
+        this->addAresta(v0, vf, peso);
+        this->addAresta(vf, v0, peso);
         m_numArestas++;
       }
     //  cout << "sair do loop1" << endl;
@@ -51,11 +53,11 @@ Lista::Lista(string path){
 }
 
 //Adiciona aresta na lista de adjacencia
-void Lista::addAresta(int v0, int vf){
+void Lista::addAresta(int v0, int vf, float peso){
   //Nao precisa adicionar no m_pLista[vf] , porque chama o addAresta 2 vezes na leitura
   ListInfo* vizinho = new ListInfo;
   vizinho->vertice = vf;
-
+  vizinho->peso = peso;
   //se vertice v0 tem alguma aresta, adiciona o novo vizinho no inicio
   if (m_pLista[v0] != NULL) m_pLista[v0]->pPrev = vizinho;
   vizinho->pNext = m_pLista[v0];
@@ -65,21 +67,21 @@ void Lista::addAresta(int v0, int vf){
 }
 
 //Retorna os vizinhos de um vértice v, sendo vértice inicial igual a 0
-vector<int> Lista::vizinhos(int v){
+vector<tuple<int, float> > Lista::vizinhos(int v){
   //Vetor que guarda todos os vizinhos
-  vector<int> vizinhos;
+  vector<tuple<int, float> > vizinhos;
   //Cria strutura para percorrer a lista e a percorre adicionando os vizinhos
   //no vetor
   ListInfo* pCrawl = new ListInfo;
   pCrawl = m_pLista[v+1];
   while(pCrawl != NULL){
-    vizinhos.push_back(pCrawl->vertice);
+    vizinhos.push_back(make_tuple(pCrawl->vertice, pCrawl->peso));
     pCrawl = pCrawl->pNext;
   }
   //for(int i=0;i<vizinhos.size();i++){
-  //  cout << vizinhos[i] << endl;
+  //  cout << get<0>(vizinhos[i]) << " ";
+  //  cout << get<1>(vizinhos[i]) << endl;
   //}
-
   //Retorna o vetor de vizinhos
   return vizinhos;
 }
@@ -118,14 +120,14 @@ vector<int> Lista::BFS(int raiz) {
 	while(!fila.empty()){
 		int v = fila.front();
 		fila.pop();
-    vector<int> w = vizinhos(v);
+    vector<tuple<int, float> > w = vizinhos(v);
     //cout << w.size() << endl;
     for(int i = 0;i< w.size();i++){
-      if(visitado[w[i]-1] == 0) {
-        visitado[w[i]-1] = 1;
-        pai[w[i]-1] = v;
-        nivel[w[i]-1] = nivel[v]+1;
-        fila.push(w[i]-1);
+      if(visitado[get<0>(w[i])-1] == 0) {
+        visitado[get<0>(w[i])-1] = 1;
+        pai[get<0>(w[i])-1] = v;
+        nivel[get<0>(w[i])-1] = nivel[v]+1;
+        fila.push(get<0>(w[i])-1);
         }
       }
     //cout << v << endl;
@@ -181,7 +183,7 @@ void Lista::Grau2(){
   //Caso o vértice que está sendo analisado tenha maior grau do que o atual
   //maior grau no vetor de comparação, atualiza o vetor. O mesmo para o menor
   for (int i = 1; i<=m_numVertices;i++){
-    vector<int> w = vizinhos(i-1);
+    vector<tuple<int, float> > w = vizinhos(i-1);
     count = w.size();
     graus[i-1] = count;
     if (count > vetorGrau[0]) {vetorGrau[0] = count;}
@@ -243,9 +245,9 @@ vector<bool> Lista::DFS(int raiz) {
     if (visitado[v]==0){
       myOut << "Vertice: " << v << ", Nivel: " << nivel[v] << ", Pai: " << pai[v] << endl;
       visitado[v]=1;
-      vector<int> w = vizinhos(v);
+      vector<tuple<int, float> > w = vizinhos(v);
       for(int i = 0; i < w.size();i++){
-        pilha.push(w[i]-1);
+        pilha.push(get<0>(w[i])-1);
           int n = pilha.top();
           pai[n] = v;
           nivel[n] = nivel[v] + 1;
@@ -293,7 +295,7 @@ void Lista::CC(){
 
   //Ordena vetor de componentes do maior tamanho para o menor
   sort(componentes.begin(), componentes.end(), [](const vector<int> & a, const vector<int> & b){ return a.size() > b.size(); });
-  
+
   //Escrita do número de componentes
   myOut << "Numero de componentes: " << count << endl;
 

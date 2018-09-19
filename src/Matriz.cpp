@@ -9,7 +9,8 @@
 #include <algorithm>
 #include <stack>
 #include <queue>
-
+#include <tuple>
+#define INF (unsigned)!((int)0)
 using namespace std;
 
 
@@ -32,16 +33,16 @@ Matriz::Matriz(string path){
   myOut << "Mnumero vertices:" << m_numVertices << endl;
 
   //Alocacao da matriz na memória
-  m_Matriz = new bool*[m_numVertices+1];
+  m_Matriz = new int*[m_numVertices+1];
   for (int i=0;i<m_numVertices+1;i++){
-    m_Matriz[i] = new bool[m_numVertices+1];
+    m_Matriz[i] = new int[m_numVertices+1];
   }
 
   //Seta todos os valores da matriz como zero
   for (int i = 0; i <= m_numVertices; i++){
     for (int j = 0; j <= m_numVertices; j++){
       //  if ((i%10 and j%10) == 0){cout<<"test"<<i<<j<<endl;};
-      m_Matriz[i][j] = false;
+      m_Matriz[i][j] = INF;
     }
   }
 
@@ -55,9 +56,10 @@ Matriz::Matriz(string path){
       //Leitura de Arquivo
       istringstream tmp(s);
       int v0, vf;
-      tmp >> v0 >> vf;
-      m_Matriz[v0][vf] = true;
-      m_Matriz[vf][v0] = true;
+      float peso;
+      tmp >> v0 >> vf >> peso;
+      m_Matriz[v0][vf] = peso;
+      m_Matriz[vf][v0] = peso;
       // this->addAresta(v0, vf);
       // this->addAresta(vf, v0);
       m_numArestas++;
@@ -75,26 +77,27 @@ Matriz::Matriz(string path){
 }
 
 //Funcao que adiciona uma aresta na matriz, setando como true
-void Matriz::addAresta(int v0, int vf){
-      m_Matriz[v0][vf] = true;
+void Matriz::addAresta(int v0, int vf, float peso){
+      m_Matriz[v0][vf] = peso;
 }
 
 //Retorna os vizinhos do vertice v, sendo vertice inicial igual a 1
-vector<int> Matriz::vizinhos(int v){
+vector<tuple<int, float> > Matriz::vizinhos(int v){
 
   //Criação do vetor de vizinhos
-  vector<int> vizinho;
+  vector<tuple<int, float> > vizinho;
 
   //Percorre a linha de adjacências do vértice passado como parâmetro e adiciona
   //no vetor de vizinhos caso exista a adjacência
   for (int i = 0; i <= m_numVertices; i++){
-    if (m_Matriz[v][i] == true){
-      vizinho.push_back(i);
+    if (m_Matriz[v][i] != INF){
+      vizinho.push_back(make_tuple(i, m_Matriz[v][i]));
     }
   }
-  //for(int i=0;i<vizinho.size();i++){
-  //  cout << vizinho[i] << endl;
-  //}
+  for(int i=0;i<vizinho.size();i++){
+    cout << get<0>(vizinho[i]) << " ";
+    cout << get<1>(vizinho[i]) << endl;
+  }
   //cout << vizinho.size();
 
   //Retorna o vetor de vizinhos
@@ -132,7 +135,7 @@ void Matriz::Grau2(){
   //Caso o vértice que está sendo analisado tenha maior grau do que o atual
   //maior grau no vetor de comparação, atualiza o vetor. O mesmo para o menor
   for (int i = 0; i<m_numVertices;i++){
-    vector<int> w = vizinhos(i+1);
+    vector<tuple<int, float> > w = vizinhos(i+1);
     count = w.size();
     graus[i] = count;
     if (count > vetorGrau[0]) {vetorGrau[0] = count;}
@@ -196,9 +199,9 @@ vector<bool> Matriz::DFS(int raiz) {
     if (visitado[v]==0){
       myOut << "Vertice: " << v << ", Nivel: " << nivel[v] << ", Pai: " << pai[v] << endl;
       visitado[v]=1;
-      vector<int> w = vizinhos(v);
+      vector<tuple<int, float> > w = vizinhos(v);
       for(int i = 0; i < w.size();i++){
-        pilha.push(w[i]);
+        pilha.push(get<0>(w[i]));
           //pai[w[i]-1] = v;
           //nivel[w[i]-1] = nivel[v]+1;
           //visitado[w[i]-1] = 1;
@@ -254,14 +257,14 @@ vector<int> Matriz::BFS(int raiz) {
 	while(!fila.empty()){
 		int v = fila.front();
 		fila.pop();
-    vector<int> w = vizinhos(v);
+    vector<tuple<int, float> > w = vizinhos(v);
     //cout << w.size() << endl;
     for(int i = 0;i< w.size();i++){
-      if(visitado[w[i]] == 0) {
-        visitado[w[i]] = 1;
-        pai[w[i]] = v;
-        nivel[w[i]] = nivel[v]+1;
-        fila.push(w[i]);
+      if(visitado[get<0>(w[i])] == 0) {
+        visitado[get<0>(w[i])] = 1;
+        pai[get<0>(w[i])] = v;
+        nivel[get<0>(w[i])] = nivel[v]+1;
+        fila.push(get<0>(w[i]));
         }
       }
     //cout << v << endl;
@@ -312,7 +315,7 @@ void Matriz::CC(){
   }
   //Ordena vetor de componentes do maior tamanho para o menor
   sort(componentes.begin(), componentes.end(), [](const vector<int> & a, const vector<int> & b){ return a.size() > b.size(); });
-  
+
   //Escrita do número de componentes
   myOut << "Numero de componentes: " << count << endl;
 

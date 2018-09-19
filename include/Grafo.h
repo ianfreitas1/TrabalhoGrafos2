@@ -4,12 +4,14 @@
 #include <string>
 #include <vector>
 #include <queue>
+#include <tuple>
 
 
 using namespace std;
 
 struct ListInfo{
     int vertice;
+    float peso;
     ListInfo *pNext, *pPrev;
 };
 

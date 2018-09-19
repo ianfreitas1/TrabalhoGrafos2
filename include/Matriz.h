@@ -4,6 +4,7 @@
 #include "Grafo.h"
 #include <string>
 #include <vector>
+#include <tuple>
 
 
 // struct int1bit{
@@ -17,15 +18,15 @@ class Matriz : public Grafo{
         Matriz(std::string path);
         ~Matriz();
         void Grau();
-        vector<int> vizinhos(int v);
+        vector<tuple<int, float> > vizinhos(int v);
         void Grau2();
         vector<bool> DFS(int raiz);
         vector<int> BFS(int raiz);
         void CC();
     protected:
 				//void iniciaMatriz(int m_numVertices);
-        void addAresta(int v0,int vf);
-				bool** m_Matriz;
+        void addAresta(int v0, int vf, float peso);
+				int** m_Matriz;
 
 
 };
