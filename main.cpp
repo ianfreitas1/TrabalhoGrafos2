@@ -30,6 +30,7 @@ int main(){
   cout << "6: distDijkstra" << endl;
   cout << "7: Caminho minimo entre dois vertices" << endl;
   cout << "8: PrimMST" << endl;
+  cout << "9: Excentricidade de um vertice" << endl;
   cin >> opcao;
   switch(opcao){
     case 1:
@@ -72,6 +73,12 @@ int main(){
       break;
     case 8:
       lista.PrimMST();
+      break;
+    case 9:
+      int v;
+      cout << "Escolha um vertice: ";
+      cin >> v;
+      lista.excentricidade(v);
       break;
   }
   //lista.Grau2();

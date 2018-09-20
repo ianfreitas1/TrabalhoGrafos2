@@ -21,6 +21,7 @@ class Lista : public Grafo{
         void caminhoMinimo(int x, int y);
         vector<int> retornaCaminho(vector<int> pai, int raiz, int v);
         void PrimMST();
+        float excentricidade(int v);
       //  ListInfo** getLista();
 
     protected:
