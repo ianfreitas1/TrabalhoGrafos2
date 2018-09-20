@@ -331,12 +331,14 @@ void Lista::distDijkstra(int raiz){
   //Adiciona a origem no heap e coloca sua distancia como 0
   heap.push(make_tuple(0, s));
   dist[s] = 0;
+  vector<bool> f(m_numVertices, false);
 
   while (!heap.empty()){
 
     //Pega o vértice no topo do heap e o retira do heap
     int v = get<1>(heap.top());
     heap.pop();
+    f[v] = true;
 
     //Acha os vizinhos do vértice a ser analisado
     vector<tuple<int, float> > w = vizinhos(v);
@@ -349,7 +351,7 @@ void Lista::distDijkstra(int raiz){
 
       //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
       //mais o peso da aresta é menor que a distância atual do vértice
-      if (dist[u] > dist[v] + peso){
+      if (f[u] == false && dist[u] > dist[v] + peso){
         //Seta o pai do vértice e atualiza sua distância
         pai[u] = v;
         dist[u] = dist[v] + peso;
@@ -393,12 +395,14 @@ vector<float> Lista::caminhoMinimo(int x, int y){
   //Adiciona a origem no heap e coloca sua distancia como 0
   heap.push(make_tuple(0, s));
   dist[s] = 0;
+  vector<bool> f(m_numVertices, false);
 
   while (!heap.empty()){
 
     //Pega o vértice no topo do heap e o retira do heap
     int v = get<1>(heap.top());
     heap.pop();
+    f[v] = true;
 
     //Acha os vizinhos do vértice a ser analisado
     vector<tuple<int, float> > w = vizinhos(v);
@@ -411,7 +415,7 @@ vector<float> Lista::caminhoMinimo(int x, int y){
 
       //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
       //mais o peso da aresta é menor que a distância atual do vértice
-      if (dist[u] > dist[v] + peso){
+      if (f[u] == false && dist[u] > dist[v] + peso){
         //Seta o pai do vértice e atualiza sua distância
         pai[u] = v;
         dist[u] = dist[v] + peso;
@@ -534,12 +538,14 @@ float Lista::excentricidade(int v){
   //Adiciona a origem no heap e coloca sua distancia como 0
   heap.push(make_tuple(0, s));
   dist[s] = 0;
+  vector<bool> f(m_numVertices, false);
 
   while (!heap.empty()){
 
     //Pega o vértice no topo do heap e o retira do heap
     int v = get<1>(heap.top());
     heap.pop();
+    f[v] = true;
 
     //Acha os vizinhos do vértice a ser analisado
     vector<tuple<int, float> > w = vizinhos(v);
@@ -552,7 +558,7 @@ float Lista::excentricidade(int v){
 
       //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
       //mais o peso da aresta é menor que a distância atual do vértice
-      if (dist[u] > dist[v] + peso){
+      if (f[u] == false && dist[u] > dist[v] + peso){
         //Seta o pai do vértice e atualiza sua distância
         pai[u] = v;
         dist[u] = dist[v] + peso;
@@ -568,6 +574,7 @@ return dist[0];
 }
 
 float Lista::distanciaMedia(){
+  float soma = 0;
   int count = 0;
   vector<float> distancias(INF, 0);
   for (int i = 1; i <= m_numVertices; i++){
@@ -576,23 +583,19 @@ float Lista::distanciaMedia(){
         ;
       }else{
         vector<float> aux = caminhoMinimo(i, j);
-        for (int k = 0; k < aux.size(); k++){
-          distancias.push_back(aux[k]);
-          count++;
+        float distAux = 0;
+        distAux = accumulate(aux.begin(), aux.end(), 0);
+        soma += distAux;
+        count++;
         }
       }
     }
+    cout << soma << endl;
+    cout << count << endl;
+    cout << soma*1.0/count;
+    return soma*1.0/count;
   }
-  float soma = 0;
-  for (auto& n : distancias){
-    soma += n;
-  }
-  cout << soma << endl;
-  cout << count << endl;
-  cout << soma*1.0/count;
-  return soma*1.0/count;
 
-}
 
 //Destrutor da lista
 Lista::~Lista(){
