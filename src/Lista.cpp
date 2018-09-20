@@ -361,7 +361,7 @@ void Lista::distDijkstra(int raiz){
   }
 
   //Escrita no arquivo de saída
-  myOut << "Origem: " << s << endl;
+  myOut << "Origem: " << raiz << endl;
   myOut << "Vertice - Distancia a Origem - Caminho" << endl;
   for (int i = 0; i < m_numVertices; i++){
     myOut << i + 1 << " \t \t \t " << dist[i];
