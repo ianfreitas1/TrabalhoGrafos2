@@ -18,7 +18,7 @@ class Lista : public Grafo{
         void CC();
         void Grau2();
         void distDijkstra(int raiz);
-        void caminhoMinimo(int raiz, int v);
+        void caminhoMinimo(int x, int y);
         vector<int> retornaCaminho(vector<int> pai, int raiz, int v);
       //  ListInfo** getLista();
 

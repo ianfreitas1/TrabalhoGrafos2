@@ -362,18 +362,73 @@ void Lista::distDijkstra(int raiz){
 
   //Escrita no arquivo de saída
   myOut << "Origem: " << s << endl;
-  myOut << "Vertice Distancia a Origem Caminho" << endl;
+  myOut << "Vertice - Distancia a Origem - Caminho" << endl;
   for (int i = 0; i < m_numVertices; i++){
-    myOut << i << " \t \t \t " << dist[i];
+    myOut << i + 1 << " \t \t \t " << dist[i];
     vector<int> caminho = retornaCaminho(pai, s, i);
     myOut << " \t \t \t \t ";
     for (int j = 0; j < caminho.size(); j++){
-        myOut  << caminho[j] << " " ;
+        myOut  << caminho[j] + 1 << " " ;
     }
     myOut << endl;
   }
 
 
+}
+
+//Essa função retorna a distância e o caminho mínimo entre um par de vértices
+void Lista::caminhoMinimo(int x, int y){
+  //Nossa origem será raiz menos um porque nossa função de vizinhos começa
+  //com a origem sendo igual a zero
+  int s = x-1;
+  //Inicialização da fila de prioridade e do vetor de distancias e de pais
+  priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
+  vector<float> dist(m_numVertices, INF);
+  vector<int> pai(m_numVertices, -1);
+
+  //Inicio do arquivo de saída
+  ofstream myOut;
+  myOut.open (m_savePath + "/Dijkstra.txt");
+
+  //Adiciona a origem no heap e coloca sua distancia como 0
+  heap.push(make_tuple(0, s));
+  dist[s] = 0;
+
+  while (!heap.empty()){
+
+    //Pega o vértice no topo do heap e o retira do heap
+    int v = get<1>(heap.top());
+    heap.pop();
+
+    //Acha os vizinhos do vértice a ser analisado
+    vector<tuple<int, float> > w = vizinhos(v);
+
+    //Percorre o vetor de vizinhos
+    for (int i = 0; i < w.size(); i++){
+      //Pega o vértice do vizinho e o peso da aresta
+      int u = get<0>(w[i]) - 1;
+      float peso = get<1>(w[i]);
+
+      //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
+      //mais o peso da aresta é menor que a distância atual do vértice
+      if (dist[u] > dist[v] + peso){
+        //Seta o pai do vértice e atualiza sua distância
+        pai[u] = v;
+        dist[u] = dist[v] + peso;
+
+        //Insere no heap o vértice e sua distância
+        heap.push(make_tuple(dist[u], u));
+      }
+    }
+  }
+
+  //Escrita no arquivo de saída
+  myOut << "Distância entre " << x << " e " << y << ": " << dist[y-1] << endl;
+  myOut << "Caminho entre " << x << " e " << y << endl;
+  vector<int> caminho = retornaCaminho(pai, s, y-1);
+  for (int j = 0; j < caminho.size(); j++){
+      myOut  << caminho[j] + 1 << " " ;
+    }
 }
 
 vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
