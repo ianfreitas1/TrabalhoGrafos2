@@ -461,10 +461,10 @@ void Lista::PrimMST(){
   //Inicialização da fila de prioridade e do vetor de pais, custo e o booleano
   //tree serve para verificar se o vertice já está na árvore
   priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<int> custo(m_numVertices, INF);
+  vector<float> custo(m_numVertices, INF);
   vector<int> pai(m_numVertices, -1);
   vector<bool> tree(m_numVertices, false);
-
+  float pesoTotal = 0;
   //Inicio do arquivo de saída
   ofstream myOut;
   myOut.open (m_savePath + "/Prim.txt");
@@ -497,14 +497,19 @@ void Lista::PrimMST(){
         //Seta o pai do vértice e atualiza seu custo
         custo[u] = peso;
         pai[u] = v;
-
         //Insere no heap o vértice e seu custo
         heap.push(make_tuple(custo[u], u));
       }
     }
   }
+  for (int i = 0; i < m_numVertices; i++){
+    pesoTotal += custo[i];
+  }
+
+
 
   //Escrita no arquivo de saída
+  myOut << "Peso total: " << pesoTotal << endl;
   myOut << m_numVertices << endl;
   for (int i = 1; i < m_numVertices; ++i){
     myOut << pai[i] + 1 << " " << i + 1 << endl;
