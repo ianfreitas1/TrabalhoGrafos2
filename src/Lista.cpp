@@ -455,6 +455,62 @@ vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
   }
 }
 
+void Lista::PrimMST(){
+  //Inicializa o vértice 0 como nossa raiz
+  int s = 0;
+  //Inicialização da fila de prioridade e do vetor de pais, custo e o booleano
+  //tree serve para verificar se o vertice já está na árvore
+  priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
+  vector<int> custo(m_numVertices, INF);
+  vector<int> pai(m_numVertices, -1);
+  vector<bool> tree(m_numVertices, false);
+
+  //Inicio do arquivo de saída
+  ofstream myOut;
+  myOut.open (m_savePath + "/Prim.txt");
+
+  //Adiciona a origem no heap e coloca seu custo como 0
+  heap.push(make_tuple(0, s));
+  custo[s] = 0;
+
+  while (!heap.empty()){
+
+    //Pega o vértice no topo do heap e o retira do heap
+    int v = get<1>(heap.top());
+    heap.pop();
+
+    //Insere o vértice na árvore
+    tree[v] = true;
+
+    //Acha os vizinhos do vértice a ser analisado
+    vector<tuple<int, float> > w = vizinhos(v);
+
+    //Percorre o vetor de vizinhos
+    for (int i = 0; i < w.size(); i++){
+      //Pega o vértice do vizinho e o peso da aresta
+      int u = get<0>(w[i]) - 1;
+      float peso = get<1>(w[i]);
+
+      //Verifica se o vértice já está na árvore e compara o custo atual do vértice
+      //com o peso da aresta analisada
+      if (tree[u] == false && custo[u] > peso){
+        //Seta o pai do vértice e atualiza seu custo
+        custo[u] = peso;
+        pai[u] = v;
+
+        //Insere no heap o vértice e seu custo
+        heap.push(make_tuple(custo[u], u));
+      }
+    }
+  }
+
+  //Escrita no arquivo de saída
+  myOut << m_numVertices << endl;
+  for (int i = 1; i < m_numVertices; ++i){
+    myOut << pai[i] + 1 << " " << i + 1 << endl;
+  }
+
+}
 //Destrutor da lista
 Lista::~Lista(){
     ListInfo* aux;

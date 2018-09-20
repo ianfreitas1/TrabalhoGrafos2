@@ -29,6 +29,7 @@ int main(){
   cout << "5: Vizinhos" << endl;
   cout << "6: distDijkstra" << endl;
   cout << "7: Caminho minimo entre dois vertices" << endl;
+  cout << "8: PrimMST" << endl;
   cin >> opcao;
   switch(opcao){
     case 1:
@@ -68,6 +69,9 @@ int main(){
       cout << "Escolha vertice 2:" << endl;
       cin >> b;
       lista.caminhoMinimo(a, b);
+      break;
+    case 8:
+      lista.PrimMST();
       break;
   }
   //lista.Grau2();

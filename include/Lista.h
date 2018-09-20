@@ -20,6 +20,7 @@ class Lista : public Grafo{
         void distDijkstra(int raiz);
         void caminhoMinimo(int x, int y);
         vector<int> retornaCaminho(vector<int> pai, int raiz, int v);
+        void PrimMST();
       //  ListInfo** getLista();
 
     protected:
