@@ -27,6 +27,7 @@ int main(){
   cout << "3: DFS" << endl;
   cout << "4: CC" << endl;
   cout << "5: Vizinhos" << endl;
+  cout << "6: distDijkstra" << endl;
   cin >> opcao;
   switch(opcao){
     case 1:
@@ -52,6 +53,12 @@ int main(){
       cout << "Escolha vertice para mostrar vizinhos: ";
       cin >> k;
       lista.vizinhos(k);
+      break;
+    case 6:
+      int s;
+      cout << "Escolha vertice raiz: ";
+      cin >> s;
+      lista.distDijkstra(s);
       break;
   }
   //lista.Grau2();

@@ -3,13 +3,15 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <vector>
-#include <stack>
-#include <queue>
+//#include <vector>
+//#include <stack>
+//include <queue>
 #include <ctime>
 #include <stdlib.h>
 #include <algorithm>
-#include <tuple>
+//#include <tuple>
+#include<bits/stdc++.h>
+#define INF 10000001
 
 using namespace std;
 
@@ -35,6 +37,7 @@ Lista::Lista(string path){
       if(s.empty() == false){
         istringstream tmp(s);                         //Leitura de Arquivo
         int v0, vf;
+        //Peso padrão igual a 1 para grafos sem peso
         float peso = 1;
         tmp >> v0 >> vf >> peso;
         this->addAresta(v0, vf, peso);
@@ -66,7 +69,8 @@ void Lista::addAresta(int v0, int vf, float peso){
 
 }
 
-//Retorna os vizinhos de um vértice v, sendo vértice inicial igual a 0
+//Retorna um vetor de tuplas de vizinhos de um vértice v, contendo o vértice
+//adjacente e o peso da aresta, sendo vértice inicial igual a 0
 vector<tuple<int, float> > Lista::vizinhos(int v){
   //Vetor que guarda todos os vizinhos
   vector<tuple<int, float> > vizinhos;
@@ -78,11 +82,13 @@ vector<tuple<int, float> > Lista::vizinhos(int v){
     vizinhos.push_back(make_tuple(pCrawl->vertice, pCrawl->peso));
     pCrawl = pCrawl->pNext;
   }
+
   //for(int i=0;i<vizinhos.size();i++){
   //  cout << get<0>(vizinhos[i]) << " ";
   //  cout << get<1>(vizinhos[i]) << endl;
   //}
-  //Retorna o vetor de vizinhos
+
+  //Retorna o vetor de tuplas vizinhos
   return vizinhos;
 }
 
@@ -309,7 +315,42 @@ void Lista::CC(){
   }
 }
 
+void Lista::distDijkstra(int raiz){
+  //Assim como na BFS, nossa origem será a raiz definida no parametro menos 1,
+  //uma vez que precisaremos da nossa função vizinhos e o vértice inicial dela
+  //é zero
+	int s = raiz-1;
+	//Inicialização da fila de prioridade e do vetor de distancias
+	priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
+  vector<float> dist(m_numVertices, INF);
 
+  //Inicio do arquivo de saída
+  ofstream myOut;
+  myOut.open (m_savePath + "/Dijkstra.txt");
+
+  heap.push(make_tuple(0, s));
+  dist[s] = 0;
+
+  while (!heap.empty()){
+    int v = get<1>(heap.top());
+    heap.pop();
+    vector<tuple<int, float> > w = vizinhos(v);
+    for (int i = 0; i < w.size(); i++){
+      int u = get<0>(w[i]) - 1;
+      float peso = get<1>(w[i]);
+      if (dist[u] > dist[v] + peso){
+        dist[u] = dist[v] + peso;
+        heap.push(make_tuple(dist[u], u));
+      }
+    }
+  }
+
+  myOut << "Vertice Distancia a Origem" << endl;
+  for (int i = 0; i < m_numVertices; i++){
+    myOut << i << " \t \t " << dist[i] << endl;
+  }
+
+}
 //Destrutor da lista
 Lista::~Lista(){
     ListInfo* aux;

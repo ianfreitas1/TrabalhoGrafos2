@@ -17,6 +17,8 @@ class Lista : public Grafo{
         vector<bool> DFS(int raiz);
         void CC();
         void Grau2();
+        void distDijkstra(int raiz);
+        void caminhoMinimo(int raiz, int v);
       //  ListInfo** getLista();
 
     protected:
