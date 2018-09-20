@@ -18,10 +18,11 @@ class Lista : public Grafo{
         void CC();
         void Grau2();
         void distDijkstra(int raiz);
-        void caminhoMinimo(int x, int y);
+        vector<float> caminhoMinimo(int x, int y);
         vector<int> retornaCaminho(vector<int> pai, int raiz, int v);
         void PrimMST();
         float excentricidade(int v);
+        float distanciaMedia();
       //  ListInfo** getLista();
 
     protected:

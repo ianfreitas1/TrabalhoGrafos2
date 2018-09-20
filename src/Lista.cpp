@@ -376,8 +376,8 @@ void Lista::distDijkstra(int raiz){
 
 }
 
-//Essa função retorna a distância e o caminho mínimo entre um par de vértices
-void Lista::caminhoMinimo(int x, int y){
+//Essa função verifica a distância e o caminho mínimo entre um par de vértices
+vector<float> Lista::caminhoMinimo(int x, int y){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
   int s = x-1;
@@ -429,6 +429,8 @@ void Lista::caminhoMinimo(int x, int y){
   for (int j = 0; j < caminho.size(); j++){
       myOut  << caminho[j] + 1 << " " ;
     }
+
+  return dist;
 }
 
 vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
@@ -564,6 +566,34 @@ sort(dist.rbegin(), dist.rend());
 myOut << "Excentricidade do vertice " << v << ": " << dist[0] << endl;
 return dist[0];
 }
+
+float Lista::distanciaMedia(){
+  int count = 0;
+  vector<float> distancias(INF, 0);
+  for (int i = 1; i <= m_numVertices; i++){
+    for (int j = 1; j <= m_numVertices; j++){
+      if (i == j){
+        ;
+      }else{
+        vector<float> aux = caminhoMinimo(i, j);
+        for (int k = 0; k < aux.size(); k++){
+          distancias.push_back(aux[k]);
+          count++;
+        }
+      }
+    }
+  }
+  float soma = 0;
+  for (auto& n : distancias){
+    soma += n;
+  }
+  cout << soma << endl;
+  cout << count << endl;
+  cout << soma*1.0/count;
+  return soma*1.0/count;
+
+}
+
 //Destrutor da lista
 Lista::~Lista(){
     ListInfo* aux;
