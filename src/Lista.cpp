@@ -317,7 +317,7 @@ void Lista::CC(){
 
 //Função que, dado um vértice raiz como parâmetro, calcula a distância e o caminho
 //mínimo desse vértice para todos os outros vértices do grafo
-void Lista::distDijkstra(int raiz){
+vector<float> Lista::distDijkstra(int raiz){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
 	int s = raiz-1;
@@ -377,7 +377,7 @@ void Lista::distDijkstra(int raiz){
     myOut << endl;
   }
 
-
+  return dist;
 }
 
 //Essa função verifica a distância e o caminho mínimo entre um par de vértices
@@ -582,40 +582,21 @@ float Lista::excentricidade(int v){
   return dist[0];
 }
 
-//Função que retorna a distancia média do grafo
-float Lista::distanciaMedia(){
-  //Inicializacão das variáveis que guardam a soma das distâncias e quantas
-  //já foram incluídas
+float Lista::distMedia(){
   float soma = 0;
   int count = 0;
-
-  //Loop para percorrer todos os pares de vértices
-  for (int i = 1; i <= m_numVertices; i++){
-    for (int j = 1; j <= m_numVertices; j++){
-      //Não adiciona a distância de vértices iguais e menores, o que
-      //diminui a complexidade do algoritmo, pois a distância u-v é computada,
-      //mas a distância v-u não. Exemplo: 1-2 é calculada porque 1 é menor que 2
-      //mas 2-1 não será calculada porque 2 é maior que 1 e essa distância é
-      //a mesma de 1-2 no grafo não direcionado
-      if (i >= j){
-        ;
-      }else{
-        //A função caminhoMinimo retorna a distância minima entre i e j
-        //Essa distância é adiciona a variável soma e a variável contadora
-        //é incrementada
-        float aux = caminhoMinimo(i, j);
-        soma += aux;
-        count++;
-        }
-      }
-    }
-    cout << soma << endl;
-    cout << count << endl;
-    cout << soma*1.0/count;
-    //Retorno da distância média
-    return soma*1.0/count;
+  for (int i=1; i <= m_numVertices; i++){
+    vector<float> aux = distDijkstra(i);
+    soma += accumulate(aux.begin(), aux.end(), 0);
+    count += aux.size();
   }
+  count -= m_numVertices;
+  cout << soma << endl;
+  cout << count << endl;
+  cout << soma*1.0/count << endl;
+  return soma*1.0/count;
 
+}
 
 //Destrutor da lista
 Lista::~Lista(){

@@ -17,12 +17,12 @@ class Lista : public Grafo{
         vector<bool> DFS(int raiz);
         void CC();
         void Grau2();
-        void distDijkstra(int raiz);
+        vector<float> distDijkstra(int raiz);
         float caminhoMinimo(int x, int y);
         vector<int> retornaCaminho(vector<int> pai, int raiz, int v);
         void PrimMST();
         float excentricidade(int v);
-        float distanciaMedia();
+        float distMedia();
       //  ListInfo** getLista();
 
     protected:

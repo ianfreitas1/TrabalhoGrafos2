@@ -32,6 +32,7 @@ int main(){
   cout << "8: PrimMST" << endl;
   cout << "9: Excentricidade de um vertice" << endl;
   cout << "10: Distancia media" << endl;
+  cout << "11: distMedia" << endl;
   cin >> opcao;
   switch(opcao){
     case 1:
@@ -83,6 +84,9 @@ int main(){
       break;
     case 10:
       lista.distanciaMedia();
+      break;
+    case 11:
+      lista.distMedia();
       break;
   }
   //lista.Grau2();
