@@ -315,6 +315,8 @@ void Lista::CC(){
   }
 }
 
+//Função que, dado um vértice raiz como parâmetro, calcula a distância e o caminho
+//mínimo desse vértice para todos os outros vértices do grafo
 void Lista::distDijkstra(int raiz){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
@@ -379,6 +381,7 @@ void Lista::distDijkstra(int raiz){
 }
 
 //Essa função verifica a distância e o caminho mínimo entre um par de vértices
+//e retorna a distância desse caminho
 float Lista::caminhoMinimo(int x, int y){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
@@ -437,6 +440,9 @@ float Lista::caminhoMinimo(int x, int y){
   return dist[y-1];
 }
 
+//Função auxiliar da função caminhoMinimo principal. Serve para retornar
+//o caminho mínimo entre dois vértices, retornando um vetor contendo
+//os vértices pertencentes ao caminho
 vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
   //Variavel auxiliar
   int i = v;
@@ -461,6 +467,8 @@ vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
   }
 }
 
+//Função que escreve no arquivo de saída o peso total de uma MST do grafo,
+//junto com o numero de vértices e as arestas pertencentes a essa árvore
 void Lista::PrimMST(){
   //Inicializa o vértice 0 como nossa raiz
   int s = 0;
@@ -522,6 +530,7 @@ void Lista::PrimMST(){
   }
 }
 
+//Função que retorna a excentricidade de um vértice v
 float Lista::excentricidade(int v){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
@@ -573,15 +582,27 @@ float Lista::excentricidade(int v){
   return dist[0];
 }
 
+//Função que retorna a distancia média do grafo
 float Lista::distanciaMedia(){
+  //Inicializacão das variáveis que guardam a soma das distâncias e quantas
+  //já foram incluídas
   float soma = 0;
   int count = 0;
-  vector<float> distancias(INF, 0);
+
+  //Loop para percorrer todos os pares de vértices
   for (int i = 1; i <= m_numVertices; i++){
     for (int j = 1; j <= m_numVertices; j++){
-      if (i == j){
+      //Não adiciona a distância de vértices iguais e menores, o que
+      //diminui a complexidade do algoritmo, pois a distância u-v é computada,
+      //mas a distância v-u não. Exemplo: 1-2 é calculada porque 1 é menor que 2
+      //mas 2-1 não será calculada porque 2 é maior que 1 e essa distância é
+      //a mesma de 1-2 no grafo não direcionado
+      if (i >= j){
         ;
       }else{
+        //A função caminhoMinimo retorna a distância minima entre i e j
+        //Essa distância é adiciona a variável soma e a variável contadora
+        //é incrementada
         float aux = caminhoMinimo(i, j);
         soma += aux;
         count++;
@@ -591,6 +612,7 @@ float Lista::distanciaMedia(){
     cout << soma << endl;
     cout << count << endl;
     cout << soma*1.0/count;
+    //Retorno da distância média
     return soma*1.0/count;
   }
 
