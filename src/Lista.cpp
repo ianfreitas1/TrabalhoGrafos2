@@ -379,7 +379,7 @@ void Lista::distDijkstra(int raiz){
 }
 
 //Essa função verifica a distância e o caminho mínimo entre um par de vértices
-vector<float> Lista::caminhoMinimo(int x, int y){
+float Lista::caminhoMinimo(int x, int y){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
   int s = x-1;
@@ -434,7 +434,7 @@ vector<float> Lista::caminhoMinimo(int x, int y){
       myOut  << caminho[j] + 1 << " " ;
     }
 
-  return dist;
+  return dist[y-1];
 }
 
 vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
@@ -568,9 +568,9 @@ float Lista::excentricidade(int v){
       }
     }
   }
-sort(dist.rbegin(), dist.rend());
-myOut << "Excentricidade do vertice " << v << ": " << dist[0] << endl;
-return dist[0];
+  sort(dist.rbegin(), dist.rend());
+  myOut << "Excentricidade do vertice " << v << ": " << dist[0] << endl;
+  return dist[0];
 }
 
 float Lista::distanciaMedia(){
@@ -582,10 +582,8 @@ float Lista::distanciaMedia(){
       if (i == j){
         ;
       }else{
-        vector<float> aux = caminhoMinimo(i, j);
-        float distAux = 0;
-        distAux = accumulate(aux.begin(), aux.end(), 0);
-        soma += distAux;
+        float aux = caminhoMinimo(i, j);
+        soma += aux;
         count++;
         }
       }
