@@ -13,7 +13,7 @@ class Lista : public Grafo{
         ~Lista();
         void Grau();
         vector<tuple<int, float> > vizinhos(int v);
-        vector<int> BFS(int raiz);
+        BFSs* BFS(int raiz);
         vector<bool> DFS(int raiz);
         void CC();
         void Grau2();
@@ -23,6 +23,9 @@ class Lista : public Grafo{
         void PrimMST();
         float excentricidade(int v);
         float distMedia();
+        bool grafoNegativo = 0;
+        bool grafoComPeso = 0;
+
       //  ListInfo** getLista();
 
     protected:

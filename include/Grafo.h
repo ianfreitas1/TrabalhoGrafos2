@@ -15,6 +15,14 @@ struct ListInfo{
     ListInfo *pNext, *pPrev;
 };
 
+//Essa struct serve para a função BFS retornar os três vetores, pois serão
+//utilizados em diferentes ocasiões na biblioteca
+struct BFSs{
+    vector<int> explorado;
+    vector<int> pai;
+    vector<int> nivel;
+};
+
 class Grafo{
     public:
       Grafo();

@@ -40,6 +40,14 @@ Lista::Lista(string path){
         //Peso padrão igual a 1 para grafos sem peso
         float peso = 1;
         tmp >> v0 >> vf >> peso;
+        //Verificação da condição de todos os pesos serem positivos
+        if (peso < 0){
+          grafoNegativo = 1;
+        }
+        //Verificação da condição do grafo possuir pesos
+        if (peso != 1){
+          grafoComPeso = 1;
+        }
         this->addAresta(v0, vf, peso);
         this->addAresta(vf, v0, peso);
         m_numArestas++;
@@ -53,6 +61,8 @@ Lista::Lista(string path){
     myOut << "numero vertices:" << m_numVertices << endl;
     myOut << "numero arestas:" << m_numArestas << endl;
     myOut.close();
+    cout << "Grafo negativo? " << grafoNegativo << endl;
+    cout << "Grafo com peso? " << grafoComPeso << endl;
 }
 
 //Adiciona aresta na lista de adjacencia
@@ -92,8 +102,8 @@ vector<tuple<int, float> > Lista::vizinhos(int v){
   return vizinhos;
 }
 
-//Retorna o vetor de explorados na BFS
-vector<int> Lista::BFS(int raiz) {
+//Retorna o struct BFSs, que contém o vetor de explorados, de pais e de niveis
+BFSs* Lista::BFS(int raiz) {
 
   //clock_t begin = clock();
   //Inicio da escrita no arquivo destino
@@ -101,9 +111,17 @@ vector<int> Lista::BFS(int raiz) {
   myOut.open (m_savePath + "/BFS.txt");
   myOut << "start" << endl;
 
+  ofstream myOut2;
+  myOut2.open (m_savePath + "/BFS - Distancia e Caminho.txt");
+
+  //Variável auxiliar a partir do struct BFSs que contém pai, nivel e vetor de
+  //explorados que será retornada pela função
+  BFSs* bfs = new BFSs;
+
   //Como nossa função de vizinhos começa no vértice 0, o inteiro s, que será
   //a origem da BFS, recebe o parâmetro passado como raiz menos 1
 	int s = raiz-1;
+
   //Inicializa e atribui valores aos vetores visitado, pai e nivel, além de
   //inicializar o vetor de explorados, que é o retorno da função, e uma fila
   //que será utilizada na nossa BFS
@@ -112,6 +130,10 @@ vector<int> Lista::BFS(int raiz) {
 	vector<int> nivel(m_numVertices,-1);
 	vector<int> explorado;
 	queue<int> fila;
+
+  bfs->pai = pai;
+  bfs->nivel = nivel;
+  bfs->explorado = explorado;
 
   //Marca a raiz como visitada, atribui nivel zero e a adiciona na fila
 	visitado[s] = 1;
@@ -142,12 +164,31 @@ vector<int> Lista::BFS(int raiz) {
     //Adiciona o vértice ao vetor explorado depois do loop
     explorado.push_back(v);
   }
+
+  //Atribuição das variáveis atualizadas na nossa estrutura
+  bfs->pai = pai;
+  bfs->nivel = nivel;
+  bfs->explorado = explorado;
+
   //Escreve no arquivo de saída o vértice, seu pai e seu nivel
   for(int i=0;i<explorado.size();i++){
     myOut << "vertice: "<< explorado[i] << ": pai:"<< pai[explorado[i]] << " nivel:" << nivel[explorado[i]] << endl;
   }
-  //Retorno do vetor explorados
-  return explorado;
+
+  myOut2 << "Origem: " << raiz << endl;
+  myOut2 << "Vertice - Distancia a Origem - Caminho" << endl;
+  for (int i = 0; i < m_numVertices; i++){
+    myOut2 << i + 1 << " \t \t \t " << nivel[i];
+    vector<int> caminho = retornaCaminho(pai, s, i);
+    myOut2 << " \t \t \t \t ";
+    for (int j = 0; j < caminho.size(); j++){
+        myOut2  << caminho[j] + 1 << " " ;
+    }
+    myOut2 << endl;
+  }
+
+  //Retorno da estrutura principal
+  return bfs;
 }
 
 
@@ -289,7 +330,7 @@ void Lista::CC(){
     //BFS no vetor de vetores componentes. Depois atualiza o id dos vértices
     //marcados e incrementa o contador de componentes
     if (id[i-1] == -1){
-      vector<int> temp = BFS(i);
+      vector<int> temp = BFS(i)->explorado;
       sort(temp.begin(), temp.end());
       componentes.push_back(temp);
       for (int j = 0; j<temp.size();j++){
@@ -333,14 +374,17 @@ vector<float> Lista::distDijkstra(int raiz){
   //Adiciona a origem no heap e coloca sua distancia como 0
   heap.push(make_tuple(0, s));
   dist[s] = 0;
-  vector<bool> f(m_numVertices, false);
+
+  //Vetor booleano que verifica se o vértice já foi retirado do heap
+  //evitando atualizações desnecessárias
+  vector<bool> retiradoHeap(m_numVertices, false);
 
   while (!heap.empty()){
 
     //Pega o vértice no topo do heap e o retira do heap
     int v = get<1>(heap.top());
     heap.pop();
-    f[v] = true;
+    retiradoHeap[v] = true;
 
     //Acha os vizinhos do vértice a ser analisado
     vector<tuple<int, float> > w = vizinhos(v);
@@ -353,7 +397,7 @@ vector<float> Lista::distDijkstra(int raiz){
 
       //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
       //mais o peso da aresta é menor que a distância atual do vértice
-      if (f[u] == false && dist[u] > dist[v] + peso){
+      if (retiradoHeap[u] == false && dist[u] > dist[v] + peso){
         //Seta o pai do vértice e atualiza sua distância
         pai[u] = v;
         dist[u] = dist[v] + peso;
@@ -398,14 +442,17 @@ float Lista::caminhoMinimo(int x, int y){
   //Adiciona a origem no heap e coloca sua distancia como 0
   heap.push(make_tuple(0, s));
   dist[s] = 0;
-  vector<bool> f(m_numVertices, false);
+
+  //Vetor booleano que verifica se o vértice já foi retirado do heap
+  //evitando atualizações desnecessárias
+  vector<bool> retiradoHeap(m_numVertices, false);
 
   while (!heap.empty()){
 
     //Pega o vértice no topo do heap e o retira do heap
     int v = get<1>(heap.top());
     heap.pop();
-    f[v] = true;
+    retiradoHeap[v] = true;
 
     //Acha os vizinhos do vértice a ser analisado
     vector<tuple<int, float> > w = vizinhos(v);
@@ -418,7 +465,7 @@ float Lista::caminhoMinimo(int x, int y){
 
       //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
       //mais o peso da aresta é menor que a distância atual do vértice
-      if (f[u] == false && dist[u] > dist[v] + peso){
+      if (retiradoHeap[u] == false && dist[u] > dist[v] + peso){
         //Seta o pai do vértice e atualiza sua distância
         pai[u] = v;
         dist[u] = dist[v] + peso;
@@ -547,14 +594,17 @@ float Lista::excentricidade(int v){
   //Adiciona a origem no heap e coloca sua distancia como 0
   heap.push(make_tuple(0, s));
   dist[s] = 0;
-  vector<bool> f(m_numVertices, false);
+
+  //Vetor booleano que verifica se o vértice já foi retirado do heap
+  //evitando atualizações desnecessárias
+  vector<bool> retiradoHeap(m_numVertices, false);
 
   while (!heap.empty()){
 
     //Pega o vértice no topo do heap e o retira do heap
     int v = get<1>(heap.top());
     heap.pop();
-    f[v] = true;
+    retiradoHeap[v] = true;
 
     //Acha os vizinhos do vértice a ser analisado
     vector<tuple<int, float> > w = vizinhos(v);
@@ -567,7 +617,7 @@ float Lista::excentricidade(int v){
 
       //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
       //mais o peso da aresta é menor que a distância atual do vértice
-      if (f[u] == false && dist[u] > dist[v] + peso){
+      if (retiradoHeap[u] == false && dist[u] > dist[v] + peso){
         //Seta o pai do vértice e atualiza sua distância
         pai[u] = v;
         dist[u] = dist[v] + peso;
@@ -577,19 +627,30 @@ float Lista::excentricidade(int v){
       }
     }
   }
+  //Ordenacao do vetor de distancias do maior para o menor
   sort(dist.rbegin(), dist.rend());
   myOut << "Excentricidade do vertice " << v << ": " << dist[0] << endl;
   return dist[0];
 }
 
+
+//Função que retorna a distância média de um grafo
 float Lista::distMedia(){
+
+  //Inicialização das variáveis de soma e contadora de distâncias
   float soma = 0;
   int count = 0;
+
   for (int i=1; i <= m_numVertices; i++){
+    //A funcao distDijkstra retorna o vetor de distâncias a partir de um vértice
     vector<float> aux = distDijkstra(i);
+    //Adiciona ao somatório a soma do vetor aux (todas as distâncias)
     soma += accumulate(aux.begin(), aux.end(), 0);
+    //Aumenta o contador
     count += aux.size();
   }
+  //Retira do contador o número de vértices pois a distância i-i (igual a zero)
+  //é incluida na função de Dijkstra
   count -= m_numVertices;
   cout << soma << endl;
   cout << count << endl;
