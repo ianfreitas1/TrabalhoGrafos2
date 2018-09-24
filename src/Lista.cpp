@@ -474,6 +474,8 @@ float Lista::caminhoMinimo(int x, int y){
         heap.push(make_tuple(dist[u], u));
       }
     }
+    //Quebra o loop caso o vértice ao qual queremos achar o caminho já tenha
+    //sido retirado do heap
     if (retiradoHeap[y-1]){
       break;
     }
@@ -566,6 +568,7 @@ void Lista::PrimMST(){
       }
     }
   }
+  //Atualização do peso total
   for (int i = 0; i < m_numVertices; i++){
     pesoTotal += custo[i];
   }
@@ -630,10 +633,11 @@ float Lista::excentricidade(int v){
       }
     }
   }
-  //Ordenacao do vetor de distancias do maior para o menor
-  sort(dist.rbegin(), dist.rend());
-  myOut << "Excentricidade do vertice " << v << ": " << dist[0] << endl;
-  return dist[0];
+  //Obtenção do valor máximo no vetor de distâncias
+  auto maximo = max_element(dist.begin(), dist.end());
+  cout << "Excentricidade do vertice " << v << ": " << *maximo << endl;
+  myOut << "Excentricidade do vertice " << v << ": " << *maximo << endl;
+  return *maximo;
 }
 
 
