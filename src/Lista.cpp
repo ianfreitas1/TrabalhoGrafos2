@@ -474,6 +474,9 @@ float Lista::caminhoMinimo(int x, int y){
         heap.push(make_tuple(dist[u], u));
       }
     }
+    if (retiradoHeap[y-1]){
+      break;
+    }
   }
 
   //Escrita no arquivo de saída
