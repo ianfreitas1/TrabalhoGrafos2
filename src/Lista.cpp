@@ -585,6 +585,7 @@ void Lista::PrimMST(){
 
 //Função que retorna a excentricidade de um vértice v
 float Lista::excentricidade(int v){
+  clock_t begin = clock();
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
 	int s = v-1;
@@ -637,6 +638,9 @@ float Lista::excentricidade(int v){
   auto maximo = max_element(dist.begin(), dist.end());
   cout << "Excentricidade do vertice " << v << ": " << *maximo << endl;
   myOut << "Excentricidade do vertice " << v << ": " << *maximo << endl;
+  clock_t	end = clock();
+	double elapsed_time = double(end-begin)/CLOCKS_PER_SEC;
+	cout << "-------------------" << endl << "TOTAL elapsed time: " << elapsed_time << "s" << endl;
   return *maximo;
 }
 
