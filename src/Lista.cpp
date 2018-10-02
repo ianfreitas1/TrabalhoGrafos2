@@ -84,7 +84,7 @@ void Lista::addAresta(int v0, int vf, float peso){
 vector<tuple<int, float> > Lista::vizinhos(int v){
   //Vetor que guarda todos os vizinhos
   vector<tuple<int, float> > vizinhos;
-  //Cria strutura para percorrer a lista e a percorre adicionando os vizinhos
+  //Cria estrutura para percorrer a lista e a percorre adicionando os vizinhos
   //no vetor
   ListInfo* pCrawl = new ListInfo;
   pCrawl = m_pLista[v+1];
@@ -190,33 +190,6 @@ BFSs* Lista::BFS(int raiz) {
   //Retorno da estrutura principal
   return bfs;
 }
-
-
-/*
-void Lista::Grau(){
-  vector<int> vetorGrau = {0,100000000,0};
-  int count = 0;
-  ListInfo* aux = new ListInfo;
-  int avg = 0;
-  for (int i=1;i<=m_numVertices;i++){
-    aux = m_pLista[i]->pNext;
-    while(aux != NULL){
-      aux = aux->pNext;
-      count++;
-    }
-    avg = avg + count;
-    if (count > vetorGrau[0]) {vetorGrau[0] = count+1;}
-    if (count < vetorGrau[1]) {vetorGrau[1] = count+1;}
-    count = 0;
-  }
-  ofstream myOut;
-  myOut.open (m_savePath + "/grau.txt");
-  myOut << "GrauMax: " << vetorGrau[0] << endl;
-  myOut << "GrauMin:" << vetorGrau[1] << endl;
-  myOut << "GrauMedio: " <<   (avg/m_numVertices)+1 << endl;
-  // myOut << "GrauMediana: " << vetorGrau[3] << endl;
-  myOut.close();
-}*/
 
 //Funcao que retorna os graus máximo, minimo, medio e mediana
 void Lista::Grau2(){
@@ -364,7 +337,7 @@ vector<float> Lista::distDijkstra(int raiz){
 	int s = raiz-1;
 	//Inicialização da fila de prioridade e do vetor de distancias e de pais
 	priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<float> dist(m_numVertices, INF);
+  vector<float> dist(m_numVertices, INT_MAX);
   vector<int> pai(m_numVertices, -1);
 
   //Inicio do arquivo de saída
@@ -432,7 +405,7 @@ float Lista::caminhoMinimo(int x, int y){
   int s = x-1;
   //Inicialização da fila de prioridade e do vetor de distancias e de pais
   priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<float> dist(m_numVertices, INF);
+  vector<float> dist(m_numVertices, INT_MAX);
   vector<int> pai(m_numVertices, -1);
 
   //Inicio do arquivo de saída
@@ -527,7 +500,7 @@ void Lista::PrimMST(){
   //Inicialização da fila de prioridade e do vetor de pais, custo e o booleano
   //tree serve para verificar se o vertice já está na árvore
   priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<float> custo(m_numVertices, INF);
+  vector<float> custo(m_numVertices, INT_MAX);
   vector<int> pai(m_numVertices, -1);
   vector<bool> tree(m_numVertices, false);
   float pesoTotal = 0;
@@ -591,7 +564,7 @@ float Lista::excentricidade(int v){
 	int s = v-1;
 	//Inicialização da fila de prioridade e do vetor de distancias e de pais
 	priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<float> dist(m_numVertices, INF);
+  vector<float> dist(m_numVertices, INT_MAX);
   vector<int> pai(m_numVertices, -1);
 
   //Inicio do arquivo de saída
