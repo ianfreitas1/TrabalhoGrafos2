@@ -56,11 +56,16 @@ int main(){
         lista.CC();
         break;
       case 5:
+      {
         int k;
         cout << "Escolha vertice para mostrar vizinhos: ";
         cin >> k;
-        lista.vizinhos(k);
+        vector<tuple<int, float> > viz = lista.vizinhos(k);
+        for (int p = 0; p < viz.size(); p++){
+          cout << get<0>(viz[p]) << endl;
+        }
         break;
+      }
       case 6:
         int s;
         cout << "Escolha vertice raiz: ";

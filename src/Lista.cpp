@@ -1,5 +1,6 @@
 #include "Lista.h"
 #include <string>
+#include "Heap.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -335,48 +336,58 @@ vector<float> Lista::distDijkstra(int raiz){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
 	int s = raiz-1;
-	//Inicialização da fila de prioridade e do vetor de distancias e de pais
-	priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<float> dist(m_numVertices, INT_MAX);
+	//Inicialização do vetor de distancias e de pais
+  vector<float> dist(m_numVertices);
   vector<int> pai(m_numVertices, -1);
 
   //Inicio do arquivo de saída
   ofstream myOut;
   myOut.open (m_savePath + "/Dijkstra.txt");
 
-  //Adiciona a origem no heap e coloca sua distancia como 0
-  heap.push(make_tuple(0, s));
+  //Criação da estrutura minHeap
+  struct MinHeap* minHeap = createMinHeap(m_numVertices);
+
+  //Inicializa o minHeap com todos os vértices e distância infinita
+  for (int v = 0; v < m_numVertices; ++v){
+      dist[v] = INT_MAX;
+      minHeap->array[v] = newMinHeapNode(v, dist[v]);
+      minHeap->pos[v] = v;
+  }
+
+  //Altera a distância da origem para 0 e atualiza o heap
+  minHeap->array[s] = newMinHeapNode(s, dist[s]);
+  minHeap->pos[s] = s;
   dist[s] = 0;
+  decreaseKey(minHeap, s, dist[s]);
 
-  //Vetor booleano que verifica se o vértice já foi retirado do heap
-  //evitando atualizações desnecessárias
-  vector<bool> retiradoHeap(m_numVertices, false);
+  //Tamanho do heap igual ao número de vértices
+  minHeap->size = m_numVertices;
 
-  while (!heap.empty()){
-
+  //Roda o loop até o heap ficar vazio
+  while (!isEmpty(minHeap)){
     //Pega o vértice no topo do heap e o retira do heap
-    int v = get<1>(heap.top());
-    heap.pop();
-    retiradoHeap[v] = true;
+    struct MinHeapNode* minHeapNode = extractMin(minHeap);
+    int u = minHeapNode->v; //Guarda o vértice extraído
 
     //Acha os vizinhos do vértice a ser analisado
-    vector<tuple<int, float> > w = vizinhos(v);
+    vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
     for (int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
-      int u = get<0>(w[i]) - 1;
+      int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
 
-      //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
-      //mais o peso da aresta é menor que a distância atual do vértice
-      if (retiradoHeap[u] == false && dist[u] > dist[v] + peso){
+      //Verifica se o vértice a ser atualizado ainda está no heap, se a distância
+      //do vértice extraído é diferente de infinito e se encontramos uma distância
+      //menor para o vértice que estamos analisando
+      if (isInMinHeap(minHeap, v) && dist[u] != INT_MAX && dist[v] > dist[u] + peso){
         //Seta o pai do vértice e atualiza sua distância
-        pai[u] = v;
-        dist[u] = dist[v] + peso;
+        pai[v] = u;
+        dist[v] = dist[u] + peso;
 
-        //Insere no heap o vértice e sua distância
-        heap.push(make_tuple(dist[u], u));
+        //Atualiza a distância do vértice no heap
+        decreaseKey(minHeap, v, dist[v]);
       }
     }
   }
@@ -403,56 +414,67 @@ float Lista::caminhoMinimo(int x, int y){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
   int s = x-1;
-  //Inicialização da fila de prioridade e do vetor de distancias e de pais
-  priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<float> dist(m_numVertices, INT_MAX);
+  //Inicialização do vetor de distancias e de pais
+  vector<float> dist(m_numVertices);
   vector<int> pai(m_numVertices, -1);
 
   //Inicio do arquivo de saída
   ofstream myOut;
   myOut.open (m_savePath + "/Dijkstra.txt");
 
-  //Adiciona a origem no heap e coloca sua distancia como 0
-  heap.push(make_tuple(0, s));
+  //Criação da estrutura minHeap
+  struct MinHeap* minHeap = createMinHeap(m_numVertices);
+
+  //Inicializa o minHeap com todos os vértices e distância infinita
+  for (int v = 0; v < m_numVertices; ++v){
+      dist[v] = INT_MAX;
+      minHeap->array[v] = newMinHeapNode(v, dist[v]);
+      minHeap->pos[v] = v;
+  }
+
+  //Altera a distância da origem para 0 e atualiza o heap
+  minHeap->array[s] = newMinHeapNode(s, dist[s]);
+  minHeap->pos[s] = s;
   dist[s] = 0;
+  decreaseKey(minHeap, s, dist[s]);
 
-  //Vetor booleano que verifica se o vértice já foi retirado do heap
-  //evitando atualizações desnecessárias
-  vector<bool> retiradoHeap(m_numVertices, false);
+  //Tamanho do heap igual ao número de vértices
+  minHeap->size = m_numVertices;
 
-  while (!heap.empty()){
+  //Roda o loop até o heap ficar vazio
+  while (!isEmpty(minHeap)){
 
     //Pega o vértice no topo do heap e o retira do heap
-    int v = get<1>(heap.top());
-    heap.pop();
-    retiradoHeap[v] = true;
+    struct MinHeapNode* minHeapNode = extractMin(minHeap);
+    int u = minHeapNode->v; //Guarda o vértice extraído
 
     //Acha os vizinhos do vértice a ser analisado
-    vector<tuple<int, float> > w = vizinhos(v);
+    vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
     for (int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
-      int u = get<0>(w[i]) - 1;
+      int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
 
-      //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
-      //mais o peso da aresta é menor que a distância atual do vértice
-      if (retiradoHeap[u] == false && dist[u] > dist[v] + peso){
+      //Verifica se o vértice a ser atualizado ainda está no heap, se a distância
+      //do vértice extraído é diferente de infinito e se encontramos uma distância
+      //menor para o vértice que estamos analisando
+      if (isInMinHeap(minHeap, v) && dist[u] != INT_MAX && dist[v] > dist[u] + peso){
         //Seta o pai do vértice e atualiza sua distância
-        pai[u] = v;
-        dist[u] = dist[v] + peso;
+        pai[v] = u;
+        dist[v] = dist[u] + peso;
 
-        //Insere no heap o vértice e sua distância
-        heap.push(make_tuple(dist[u], u));
+        //Atualiza a distância do vértice no heap
+        decreaseKey(minHeap, v, dist[v]);
       }
-    }
     //Quebra o loop caso o vértice ao qual queremos achar o caminho já tenha
     //sido retirado do heap
-    if (retiradoHeap[y-1]){
+    if (!isInMinHeap(minHeap, y-1)){
       break;
     }
   }
+}
 
   //Escrita no arquivo de saída
   myOut << "Distância entre " << x << " e " << y << ": " << dist[y-1] << endl;
@@ -495,49 +517,60 @@ vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
 //Função que escreve no arquivo de saída o peso total de uma MST do grafo,
 //junto com o numero de vértices e as arestas pertencentes a essa árvore
 void Lista::PrimMST(){
+  clock_t begin = clock();
   //Inicializa o vértice 0 como nossa raiz
   int s = 0;
-  //Inicialização da fila de prioridade e do vetor de pais, custo e o booleano
-  //tree serve para verificar se o vertice já está na árvore
-  priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<float> custo(m_numVertices, INT_MAX);
+  //Inicialização do vetor de pais e de custo, além da variável que guardará
+  //o peso total da árvore
+  vector<float> custo(m_numVertices);
   vector<int> pai(m_numVertices, -1);
-  vector<bool> tree(m_numVertices, false);
   float pesoTotal = 0;
   //Inicio do arquivo de saída
   ofstream myOut;
   myOut.open (m_savePath + "/Prim.txt");
 
-  //Adiciona a origem no heap e coloca seu custo como 0
-  heap.push(make_tuple(0, s));
+  //Criação da estrutura minHeap
+  struct MinHeap* minHeap = createMinHeap(m_numVertices);
+
+  //Inicializa o minHeap com todos os vértices e distância infinita
+  for (int v = 0; v < m_numVertices; ++v){
+      custo[v] = INT_MAX;
+      minHeap->array[v] = newMinHeapNode(v, custo[v]);
+      minHeap->pos[v] = v;
+  }
+
+  //Altera a distância da origem para 0 e atualiza o heap
+  minHeap->array[s] = newMinHeapNode(s, custo[s]);
+  minHeap->pos[s] = s;
   custo[s] = 0;
+  decreaseKey(minHeap, s, custo[s]);
 
-  while (!heap.empty()){
+  //Tamanho do heap igual ao número de vértices
+  minHeap->size = m_numVertices;
 
+  //Roda o loop até o heap ficar vazio
+  while (!isEmpty(minHeap)){
     //Pega o vértice no topo do heap e o retira do heap
-    int v = get<1>(heap.top());
-    heap.pop();
-
-    //Insere o vértice na árvore
-    tree[v] = true;
+    struct MinHeapNode* minHeapNode = extractMin(minHeap);
+    int u = minHeapNode->v; ////Guarda o vértice extraído
 
     //Acha os vizinhos do vértice a ser analisado
-    vector<tuple<int, float> > w = vizinhos(v);
+    vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
     for (int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
-      int u = get<0>(w[i]) - 1;
+      int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
 
-      //Verifica se o vértice já está na árvore e compara o custo atual do vértice
+      //Verifica se o vértice já está no heap e compara o custo atual do vértice
       //com o peso da aresta analisada
-      if (tree[u] == false && custo[u] > peso){
+      if (isInMinHeap(minHeap, v) && custo[v] > peso){
         //Seta o pai do vértice e atualiza seu custo
-        custo[u] = peso;
-        pai[u] = v;
-        //Insere no heap o vértice e seu custo
-        heap.push(make_tuple(custo[u], u));
+        custo[v] = peso;
+        pai[v] = u;
+        //Atualiza no heap o custo
+        decreaseKey(minHeap, v, custo[v]);
       }
     }
   }
@@ -546,14 +579,15 @@ void Lista::PrimMST(){
     pesoTotal += custo[i];
   }
 
-
-
   //Escrita no arquivo de saída
   myOut << "Peso total: " << pesoTotal << endl;
   myOut << m_numVertices << endl;
   for (int i = 1; i < m_numVertices; ++i){
     myOut << pai[i] + 1 << " " << i + 1 << endl;
   }
+  clock_t	end = clock();
+	double elapsed_time = double(end-begin)/CLOCKS_PER_SEC;
+	cout << "-------------------" << endl << "TOTAL elapsed time: " << elapsed_time << "s" << endl;
 }
 
 //Função que retorna a excentricidade de um vértice v
@@ -563,47 +597,57 @@ float Lista::excentricidade(int v){
   //com a origem sendo igual a zero
 	int s = v-1;
 	//Inicialização da fila de prioridade e do vetor de distancias e de pais
-	priority_queue< tuple<float, int>, vector<tuple<float, int> >, greater<tuple<float, int> > > heap;
-  vector<float> dist(m_numVertices, INT_MAX);
+  vector<float> dist(m_numVertices);
   vector<int> pai(m_numVertices, -1);
 
   //Inicio do arquivo de saída
   ofstream myOut;
   myOut.open (m_savePath + "/Excentricidade.txt");
 
-  //Adiciona a origem no heap e coloca sua distancia como 0
-  heap.push(make_tuple(0, s));
+  //Criação da estrutura minHeap
+  struct MinHeap* minHeap = createMinHeap(m_numVertices);
+
+  //Inicializa o minHeap com todos os vértices e distância infinita
+  for (int v = 0; v < m_numVertices; ++v){
+      dist[v] = INT_MAX;
+      minHeap->array[v] = newMinHeapNode(v, dist[v]);
+      minHeap->pos[v] = v;
+  }
+
+  //Altera a distância da origem para 0 e atualiza o heap
+  minHeap->array[s] = newMinHeapNode(s, dist[s]);
+  minHeap->pos[s] = s;
   dist[s] = 0;
+  decreaseKey(minHeap, s, dist[s]);
 
-  //Vetor booleano que verifica se o vértice já foi retirado do heap
-  //evitando atualizações desnecessárias
-  vector<bool> retiradoHeap(m_numVertices, false);
+  //Tamanho do heap igual ao número de vértices
+  minHeap->size = m_numVertices;
 
-  while (!heap.empty()){
-
+  //Roda o loop até o heap ficar vazio
+  while (!isEmpty(minHeap)){
     //Pega o vértice no topo do heap e o retira do heap
-    int v = get<1>(heap.top());
-    heap.pop();
-    retiradoHeap[v] = true;
+    struct MinHeapNode* minHeapNode = extractMin(minHeap);
+    int u = minHeapNode->v; //Guarda o vértice extraído
 
     //Acha os vizinhos do vértice a ser analisado
-    vector<tuple<int, float> > w = vizinhos(v);
+    vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
     for (int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
-      int u = get<0>(w[i]) - 1;
+      int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
 
-      //Verifica como no pseudocódigo de Dijkstra se a distancia do vértice pai
-      //mais o peso da aresta é menor que a distância atual do vértice
-      if (retiradoHeap[u] == false && dist[u] > dist[v] + peso){
+      //Verifica se o vértice a ser atualizado ainda está no heap, se a distância
+      //do vértice extraído é diferente de infinito e se encontramos uma distância
+      //menor para o vértice que estamos analisando
+      if (isInMinHeap(minHeap, v) && dist[u] != INT_MAX && dist[v] > dist[u] + peso){
         //Seta o pai do vértice e atualiza sua distância
-        pai[u] = v;
-        dist[u] = dist[v] + peso;
+        pai[v] = u;
+        dist[v] = dist[u] + peso;
 
-        //Insere no heap o vértice e sua distância
-        heap.push(make_tuple(dist[u], u));
+        //Atualiza a distância do vértice no heap
+        decreaseKey(minHeap, v, dist[v]);
       }
     }
   }
@@ -640,7 +684,6 @@ float Lista::distMedia(){
   cout << count << endl;
   cout << soma*1.0/count << endl;
   return soma*1.0/count;
-
 }
 
 //Destrutor da lista
