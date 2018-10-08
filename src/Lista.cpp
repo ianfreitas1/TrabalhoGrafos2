@@ -57,6 +57,7 @@ Lista::Lista(string path){
     }
     //cout << "sair do loop2" << endl;
     //Grava no arquivo de saída o numero de vertices e arestas
+
     ofstream myOut;
     myOut.open (m_savePath + "/info.txt");
     myOut << "numero vertices:" << m_numVertices << endl;
@@ -93,11 +94,6 @@ vector<tuple<int, float> > Lista::vizinhos(int v){
     vizinhos.push_back(make_tuple(pCrawl->vertice, pCrawl->peso));
     pCrawl = pCrawl->pNext;
   }
-
-  //for(int i=0;i<vizinhos.size();i++){
-  //  cout << get<0>(vizinhos[i]) << " ";
-  //  cout << get<1>(vizinhos[i]) << endl;
-  //}
 
   //Retorna o vetor de tuplas vizinhos
   return vizinhos;
@@ -408,6 +404,65 @@ vector<float> Lista::distDijkstra(int raiz){
   return dist;
 }
 
+float Lista::distMedia_Dijkstra(int raiz){
+  //Nossa origem será raiz menos um porque nossa função de vizinhos começa
+  //com a origem sendo igual a zero
+	int s = raiz-1;
+	//Inicialização do vetor de distancias e de pais
+  vector<float> dist(m_numVertices);
+  //vector<int> pai(m_numVertices, -1);
+
+  //Criação da estrutura minHeap
+  struct MinHeap* minHeap = createMinHeap(m_numVertices);
+
+  //Inicializa o minHeap com todos os vértices e distância infinita
+  for (int v = 0; v < m_numVertices; ++v){
+      dist[v] = INT_MAX;
+      minHeap->array[v] = newMinHeapNode(v, dist[v]);
+      minHeap->pos[v] = v;
+  }
+
+  //Altera a distância da origem para 0 e atualiza o heap
+  minHeap->array[s] = newMinHeapNode(s, dist[s]);
+  minHeap->pos[s] = s;
+  dist[s] = 0;
+  decreaseKey(minHeap, s, dist[s]);
+
+  //Tamanho do heap igual ao número de vértices
+  minHeap->size = m_numVertices;
+
+  //Roda o loop até o heap ficar vazio
+  while (!isEmpty(minHeap)){
+    //Pega o vértice no topo do heap e o retira do heap
+    struct MinHeapNode* minHeapNode = extractMin(minHeap);
+    int u = minHeapNode->v; //Guarda o vértice extraído
+
+    //Acha os vizinhos do vértice a ser analisado
+    vector<tuple<int, float> > w = vizinhos(u);
+
+    //Percorre o vetor de vizinhos
+    for (int i = 0; i < w.size(); i++){
+      //Pega o vértice do vizinho e o peso da aresta
+      int v = get<0>(w[i]) - 1;
+      float peso = get<1>(w[i]);
+
+      //Verifica se o vértice a ser atualizado ainda está no heap, se a distância
+      //do vértice extraído é diferente de infinito e se encontramos uma distância
+      //menor para o vértice que estamos analisando
+      if (isInMinHeap(minHeap, v) && dist[u] != INT_MAX && dist[v] > dist[u] + peso){
+        //Seta o pai do vértice e atualiza sua distância
+        //pai[v] = u;
+        dist[v] = dist[u] + peso;
+
+        //Atualiza a distância do vértice no heap
+        decreaseKey(minHeap, v, dist[v]);
+      }
+    }
+  }
+
+  return accumulate(dist.begin(), dist.end(), 0);
+}
+
 //Essa função verifica a distância e o caminho mínimo entre um par de vértices
 //e retorna a distância desse caminho
 float Lista::caminhoMinimo(int x, int y){
@@ -592,6 +647,10 @@ void Lista::PrimMST(){
 
 //Função que retorna a excentricidade de um vértice v
 float Lista::excentricidade(int v){
+  //Inicio do arquivo de saída
+  ofstream myOut;
+  myOut.open (m_savePath + "/Excentricidade.txt");
+
   clock_t begin = clock();
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
@@ -599,10 +658,6 @@ float Lista::excentricidade(int v){
 	//Inicialização da fila de prioridade e do vetor de distancias e de pais
   vector<float> dist(m_numVertices);
   vector<int> pai(m_numVertices, -1);
-
-  //Inicio do arquivo de saída
-  ofstream myOut;
-  myOut.open (m_savePath + "/Excentricidade.txt");
 
   //Criação da estrutura minHeap
   struct MinHeap* minHeap = createMinHeap(m_numVertices);
@@ -653,10 +708,11 @@ float Lista::excentricidade(int v){
   }
   //Obtenção do valor máximo no vetor de distâncias
   auto maximo = max_element(dist.begin(), dist.end());
+  clock_t	end = clock();
   cout << "Excentricidade do vertice " << v << ": " << *maximo << endl;
   myOut << "Excentricidade do vertice " << v << ": " << *maximo << endl;
-  clock_t	end = clock();
-	double elapsed_time = double(end-begin)/CLOCKS_PER_SEC;
+
+  double elapsed_time = double(end-begin)/CLOCKS_PER_SEC;
 	cout << "-------------------" << endl << "TOTAL elapsed time: " << elapsed_time << "s" << endl;
   return *maximo;
 }
@@ -664,25 +720,27 @@ float Lista::excentricidade(int v){
 
 //Função que retorna a distância média de um grafo
 float Lista::distMedia(){
-
+  clock_t begin = clock();
   //Inicialização das variáveis de soma e contadora de distâncias
-  float soma = 0;
+  double soma = 0;
   int count = 0;
-
-  for (int i=1; i <= m_numVertices; i++){
+  for (int i = 1; i <= m_numVertices; i++){
     //A funcao distDijkstra retorna o vetor de distâncias a partir de um vértice
-    vector<float> aux = distDijkstra(i);
-    //Adiciona ao somatório a soma do vetor aux (todas as distâncias)
-    soma += accumulate(aux.begin(), aux.end(), 0);
+    double aux = distMedia_Dijkstra(i);
+    soma += aux;
     //Aumenta o contador
-    count += aux.size();
+    count += m_numVertices;
+    cout << i << endl;
   }
   //Retira do contador o número de vértices pois a distância i-i (igual a zero)
   //é incluida na função de Dijkstra
   count -= m_numVertices;
   cout << soma << endl;
   cout << count << endl;
-  cout << soma*1.0/count << endl;
+  cout << soma/count << endl;
+  clock_t	end = clock();
+  double elapsed_time = double(end-begin)/CLOCKS_PER_SEC;
+	cout << "-------------------" << endl << "TOTAL elapsed time: " << elapsed_time << "s" << endl;
   return soma*1.0/count;
 }
 
