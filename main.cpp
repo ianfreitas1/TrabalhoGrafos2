@@ -22,7 +22,7 @@ int main(){
   //matriz.vizinhos(1);
   Lista lista = Lista(arquivo);
   int opcao = 1;
-  while (opcao < 11 && opcao > 0){
+  while (opcao < 12 && opcao > 0){
     cout << "1: Grau" << endl;
     cout << "2: BFS" << endl;
     cout << "3: DFS" << endl;
@@ -33,7 +33,8 @@ int main(){
     cout << "8: PrimMST" << endl;
     cout << "9: Excentricidade de um vertice" << endl;
     cout << "10: Distancia media" << endl;
-    cout << "11: Sair" << endl;
+    cout << "11: Tempo medio Excentricidade (Estudo de caso)" << endl;
+    cout << "12: Sair" << endl;
     cin >> opcao;
     system("CLS");
     switch(opcao){
@@ -128,6 +129,22 @@ int main(){
       case 10:
         lista.distMedia();
         break;
+      case 11:
+        double tempototal = 0;
+        int count = 0;
+        for (int i = 0; i < 100; i++){
+          int a = rand() % lista.m_numVertices + 1;
+          clock_t inicio = clock();
+          lista.excentricidade(a);
+          clock_t fim = clock();
+          double tempo = double(fim-inicio)/CLOCKS_PER_SEC;
+          tempototal += tempo;
+          count++;
+        }
+       cout << count << endl;
+       cout << tempototal << endl;
+       cout << tempototal/count << endl;
+       break;
     }
   }
 
