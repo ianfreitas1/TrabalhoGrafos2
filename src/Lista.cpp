@@ -147,7 +147,7 @@ BFSs* Lista::BFS(int raiz) {
 		fila.pop();
     vector<tuple<int, float> > w = vizinhos(v);
     //cout << w.size() << endl;
-    for(int i = 0;i< w.size();i++){
+    for(unsigned int i = 0;i< w.size();i++){
       if(visitado[get<0>(w[i])-1] == 0) {
         visitado[get<0>(w[i])-1] = 1;
         pai[get<0>(w[i])-1] = v;
@@ -168,7 +168,7 @@ BFSs* Lista::BFS(int raiz) {
   bfs->explorado = explorado;
 
   //Escreve no arquivo de saída o vértice, seu pai e seu nivel
-  for(int i=0;i<explorado.size();i++){
+  for(unsigned int i=0;i<explorado.size();i++){
     myOut << "vertice: "<< explorado[i] << ": pai:"<< pai[explorado[i]] << " nivel:" << nivel[explorado[i]] << endl;
   }
 
@@ -178,7 +178,7 @@ BFSs* Lista::BFS(int raiz) {
     myOut2 << i + 1 << " \t \t \t " << nivel[i];
     vector<int> caminho = retornaCaminho(pai, s, i);
     myOut2 << " \t \t \t \t ";
-    for (int j = 0; j < caminho.size(); j++){
+    for (unsigned int j = 0; j < caminho.size(); j++){
         myOut2  << caminho[j] + 1 << " " ;
     }
     myOut2 << endl;
@@ -263,7 +263,7 @@ vector<bool> Lista::DFS(int raiz) {
       myOut << "Vertice: " << v << ", Nivel: " << nivel[v] << ", Pai: " << pai[v] << endl;
       visitado[v]=1;
       vector<tuple<int, float> > w = vizinhos(v);
-      for(int i = 0; i < w.size();i++){
+      for(unsigned int i = 0; i < w.size();i++){
         pilha.push(get<0>(w[i])-1);
           int n = pilha.top();
           pai[n] = v;
@@ -303,7 +303,7 @@ void Lista::CC(){
       vector<int> temp = BFS(i)->explorado;
       sort(temp.begin(), temp.end());
       componentes.push_back(temp);
-      for (int j = 0; j<temp.size();j++){
+      for (unsigned int j = 0; j<temp.size();j++){
         id[temp[j]] = count;
       }
     count++;
@@ -317,9 +317,9 @@ void Lista::CC(){
   myOut << "Numero de componentes: " << count << endl;
 
   //Escrita de cada componente e seus respectivos vértices
-  for (int i = 0; i < componentes.size();i++){
+  for (unsigned int i = 0; i < componentes.size();i++){
     myOut << "Componente " << i+1 << ": ";
-    for (int j = 0; j < componentes[i].size();j++){
+    for (unsigned int j = 0; j < componentes[i].size();j++){
        myOut << componentes[i][j]+1 << ", ";
     }
     myOut << endl;
@@ -369,7 +369,7 @@ vector<float> Lista::distDijkstra(int raiz){
     vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
-    for (int i = 0; i < w.size(); i++){
+    for (unsigned int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
       int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
@@ -395,7 +395,7 @@ vector<float> Lista::distDijkstra(int raiz){
     myOut << i + 1 << " \t \t \t " << dist[i];
     vector<int> caminho = retornaCaminho(pai, s, i);
     myOut << " \t \t \t \t ";
-    for (int j = 0; j < caminho.size(); j++){
+    for (unsigned int j = 0; j < caminho.size(); j++){
         myOut  << caminho[j] + 1 << " " ;
     }
     myOut << endl;
@@ -404,7 +404,7 @@ vector<float> Lista::distDijkstra(int raiz){
   return dist;
 }
 
-float Lista::distMedia_Dijkstra(int raiz){
+vector<float> Lista::distMedia_Dijkstra(int raiz){
   //Nossa origem será raiz menos um porque nossa função de vizinhos começa
   //com a origem sendo igual a zero
 	int s = raiz-1;
@@ -441,7 +441,7 @@ float Lista::distMedia_Dijkstra(int raiz){
     vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
-    for (int i = 0; i < w.size(); i++){
+    for (unsigned int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
       int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
@@ -458,9 +458,14 @@ float Lista::distMedia_Dijkstra(int raiz){
         decreaseKey(minHeap, v, dist[v]);
       }
     }
+    free(minHeapNode);
   }
-
-  return accumulate(dist.begin(), dist.end(), 0);
+  for (int i = 0; i < m_numVertices; i++){
+    free(minHeap->array[i]);
+  }
+  free(minHeap->array);
+  free(minHeap);
+  return dist;
 }
 
 //Essa função verifica a distância e o caminho mínimo entre um par de vértices
@@ -507,7 +512,7 @@ float Lista::caminhoMinimo(int x, int y){
     vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
-    for (int i = 0; i < w.size(); i++){
+    for (unsigned int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
       int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
@@ -535,7 +540,7 @@ float Lista::caminhoMinimo(int x, int y){
   myOut << "Distância entre " << x << " e " << y << ": " << dist[y-1] << endl;
   myOut << "Caminho entre " << x << " e " << y << endl;
   vector<int> caminho = retornaCaminho(pai, s, y-1);
-  for (int j = 0; j < caminho.size(); j++){
+  for (unsigned int j = 0; j < caminho.size(); j++){
       myOut  << caminho[j] + 1 << " " ;
     }
 
@@ -613,7 +618,7 @@ void Lista::PrimMST(){
     vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
-    for (int i = 0; i < w.size(); i++){
+    for (unsigned int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
       int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
@@ -688,7 +693,7 @@ float Lista::excentricidade(int v){
     vector<tuple<int, float> > w = vizinhos(u);
 
     //Percorre o vetor de vizinhos
-    for (int i = 0; i < w.size(); i++){
+    for (unsigned int i = 0; i < w.size(); i++){
       //Pega o vértice do vizinho e o peso da aresta
       int v = get<0>(w[i]) - 1;
       float peso = get<1>(w[i]);
@@ -724,13 +729,14 @@ float Lista::distMedia(){
   //Inicialização das variáveis de soma e contadora de distâncias
   double soma = 0;
   int count = 0;
-  for (int i = 1; i <= m_numVertices; i++){
+  for (int i = 0; i < m_numVertices; i++){
     //A funcao distDijkstra retorna o vetor de distâncias a partir de um vértice
-    double aux = distMedia_Dijkstra(i);
-    soma += aux;
+    vector<float> aux = distMedia_Dijkstra(i+1);
+    soma += accumulate(aux.begin()+i, aux.end(), 0);
     //Aumenta o contador
-    count += m_numVertices;
+    count += aux.size()-i;
     cout << i << endl;
+    delete &aux;
   }
   //Retira do contador o número de vértices pois a distância i-i (igual a zero)
   //é incluida na função de Dijkstra

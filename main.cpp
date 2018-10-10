@@ -62,7 +62,7 @@ int main(){
         cout << "Escolha vertice para mostrar vizinhos: ";
         cin >> k;
         vector<tuple<int, float> > viz = lista.vizinhos(k);
-        for (int p = 0; p < viz.size(); p++){
+        for (unsigned int p = 0; p < viz.size(); p++){
           cout << get<0>(viz[p]) << endl;
         }
         break;
@@ -109,7 +109,7 @@ int main(){
           myOut2 << "Caminho entre " << a << " e " << b << endl;
           vector<int> caminho = lista.retornaCaminho(bfs->pai, a-1, b-1);
           //Escrita do caminho no arquivo de saída
-          for (int j = 0; j < caminho.size(); j++){
+          for (unsigned int j = 0; j < caminho.size(); j++){
               myOut2  << caminho[j] + 1 << " " ;
             }
         //Caso contrário, o grafo tem pesos negativos

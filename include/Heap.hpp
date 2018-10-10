@@ -14,15 +14,15 @@ struct MinHeap
 {
     int size;      //Número de nós atualmente no heap
     int capacity;  //Capacidade máxima do heap
-    int *pos;     //Necessário para a função decreaseKey()
+    vector<int> pos;     //Necessário para a função decreaseKey()
     struct MinHeapNode **array;
 };
 
 //Função para criar um nó do minHeap
 struct MinHeapNode* newMinHeapNode(int v, float dist)
 {
-    struct MinHeapNode* minHeapNode =
-           (struct MinHeapNode*) malloc(sizeof(struct MinHeapNode));
+    struct MinHeapNode* minHeapNode = new MinHeapNode;
+           //(struct MinHeapNode*) malloc(sizeof(struct MinHeapNode));
     minHeapNode->v = v;
     minHeapNode->dist = dist;
     return minHeapNode;
@@ -31,9 +31,9 @@ struct MinHeapNode* newMinHeapNode(int v, float dist)
 //Função para criar um MinHeap
 struct MinHeap* createMinHeap(int capacity)
 {
-    struct MinHeap* minHeap =
-         (struct MinHeap*) malloc(sizeof(struct MinHeap));
-    minHeap->pos = (int *)malloc(capacity * sizeof(int));
+    struct MinHeap* minHeap = new MinHeap;
+         //(struct MinHeap*) malloc(sizeof(struct MinHeap));
+    minHeap->pos.reserve(capacity);
     minHeap->size = 0;
     minHeap->capacity = capacity;
     minHeap->array =
@@ -89,6 +89,9 @@ int isEmpty(struct MinHeap* minHeap)
     return minHeap->size == 0;
 }
 
+struct MinHeapNode* returnMin(struct MinHeap* minHeap){
+  return minHeap->array[0];
+}
 //Função para extrair a raiz do heap
 struct MinHeapNode* extractMin(struct MinHeap* minHeap)
 {
@@ -105,11 +108,9 @@ struct MinHeapNode* extractMin(struct MinHeap* minHeap)
     //Atualiza posição do último nó
     minHeap->pos[root->v] = minHeap->size-1;
     minHeap->pos[lastNode->v] = 0;
-
     //Reduz o tamanho do heap e faz o heapify a partir da raiz
     --minHeap->size;
     minHeapify(minHeap, 0);
-
     return root;
 }
 
