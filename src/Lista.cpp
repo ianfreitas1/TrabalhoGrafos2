@@ -12,6 +12,8 @@
 #include <algorithm>
 //#include <tuple>
 #include<bits/stdc++.h>
+#include <math.h>
+
 #define INF 10000001
 
 using namespace std;
@@ -19,41 +21,74 @@ using namespace std;
 //Construtor da lista que adiciona todas as arestas de um grafo
 //e retorna o numero de vertices e arestas
 Lista::Lista(string path){
-    //Checa se o arquivo existe, se nao imprime uma mensagem de erro
-    ifstream myFile;
-    myFile.open(path);
-    if(!myFile){
-      cout << "Location not Found";
-    }
-    //Recebe a primeira linha do arquivo e guarda na variavel numero de vertices
-    myFile >> m_numVertices;
-    //Aloca espaco da estrutura ListInfo e preenche tudo com zero
-    m_pLista = new ListInfo*[m_numVertices+1]();
-    //Numero de arestas inicial igual a 0
-    //Depois ocorre a leitura de cada linha do arquivo, adicionando as respectivas
-    //arestas e incrementando o numero de arestas
-    m_numArestas = 0;
-    string s;
-    while(getline(myFile, s)){
-      if(s.empty() == false){
+  ifstream myFile;
+  myFile.open(path);
+  if(!myFile){
+    cout << "Location not Found";
+  }
+
+  if (grafoEuclid == 1) {
+      myFile >> m_numVertices;
+      m_pLista = new ListInfo*[m_numVertices+1]();
+      m_numArestas = (m_numVertices*(m_numVertices-1))/2;
+      int vectorPos[m_numVertices][2] = {0,0};
+      string s;
+      int aux = 0;
+      while(getline(myFile, s)){
         istringstream tmp(s);                         //Leitura de Arquivo
-        int v0, vf;
-        //Peso padrão igual a 1 para grafos sem peso
-        float peso = 1;
-        tmp >> v0 >> vf >> peso;
-        //Verificação da condição de todos os pesos serem positivos
-        if (peso < 0){
-          grafoNegativo = 1;
-        }
-        //Verificação da condição do grafo possuir pesos
-        if (peso != 1){
-          grafoComPeso = 1;
-        }
-        this->addAresta(v0, vf, peso);
-        this->addAresta(vf, v0, peso);
-        m_numArestas++;
+        int x0, y0;
+        tmp >> x0 >> y0;
+        vectorPos[aux][0] = x0;
+        vectorPos[aux][1] = y0;
+        //cout << aux << "x0 : " << x0 << endl;
+        aux++;
       }
-    //  cout << "sair do loop1" << endl;
+      float dist;
+      for (int i = 1;i<m_numVertices+1;i++){
+        for (int j = 1;j<m_numVertices+1;j++){
+          float x_d = vectorPos[i][0] - vectorPos[j][0];
+          float y_d = vectorPos[i][1] - vectorPos[j][1];
+          dist = pow(x_d, 2) + pow(y_d, 2);       //calculating Euclidean distance
+          dist = sqrt(dist);
+          cout << "par: " << i << "," << j << "dist: " <<dist << endl;
+          this->addAresta(i,j,dist);
+        //  cout << "vector Pos" << "x: " << vectorPos[i][0] << "y: " << vectorPos[i][1] << endl;
+      //    cout << i << j << dist << endl;
+        }
+      }
+
+    }else{
+
+      //Recebe a primeira linha do arquivo e guarda na variavel numero de vertices
+      myFile >> m_numVertices;
+      //Aloca espaco da estrutura ListInfo e preenche tudo com zero
+      m_pLista = new ListInfo*[m_numVertices+1]();
+      //Numero de arestas inicial igual a 0
+      //Depois ocorre a leitura de cada linha do arquivo, adicionando as respectivas
+      //arestas e incrementando o numero de arestas
+      m_numArestas = 0;
+      string s;
+      while(getline(myFile, s)){
+        if(s.empty() == false){
+          istringstream tmp(s);                         //Leitura de Arquivo
+          int v0, vf;
+          //Peso padrão igual a 1 para grafos sem peso
+          float peso = 1;
+          tmp >> v0 >> vf >> peso;
+          //Verificação da condição de todos os pesos serem positivos
+          if (peso < 0){
+            grafoNegativo = 1;
+          }
+          //Verificação da condição do grafo possuir pesos
+          if (peso != 1){
+            grafoComPeso = 1;
+          }
+          this->addAresta(v0, vf, peso);
+          this->addAresta(vf, v0, peso);
+          m_numArestas++;
+        }
+      //  cout << "sair do loop1" << endl;
+      }
     }
     //cout << "sair do loop2" << endl;
     //Grava no arquivo de saída o numero de vertices e arestas

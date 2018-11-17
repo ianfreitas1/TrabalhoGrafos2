@@ -25,6 +25,7 @@ class Lista : public Grafo{
         float distMedia();
         bool grafoNegativo = 0;
         bool grafoComPeso = 0;
+        bool grafoEuclid = 1;
         vector<float> distMedia_Dijkstra(int raiz);
       //  ListInfo** getLista();
 
