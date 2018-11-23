@@ -46,14 +46,14 @@ Lista::Lista(string path){
       float dist;
       for (int i = 1;i<m_numVertices+1;i++){
         for (int j = 1;j<m_numVertices+1;j++){
-          float x_d = vectorPos[i][0] - vectorPos[j][0];
-          float y_d = vectorPos[i][1] - vectorPos[j][1];
-          dist = pow(x_d, 2) + pow(y_d, 2);       //calculating Euclidean distance
-          dist = sqrt(dist);
-          cout << "par: " << i << "," << j << "dist: " <<dist << endl;
-          this->addAresta(i,j,dist);
-        //  cout << "vector Pos" << "x: " << vectorPos[i][0] << "y: " << vectorPos[i][1] << endl;
-      //    cout << i << j << dist << endl;
+          if (i != j+1){
+            float x_d = vectorPos[i][0] - vectorPos[j][0];
+            float y_d = vectorPos[i][1] - vectorPos[j][1];
+            dist = pow(x_d, 2) + pow(y_d, 2);       //calculating Euclidean distance
+            dist = sqrt(dist);
+            //cout << "par: " << i << "," << j << "dist: " <<dist << endl;
+            this->addAresta(i,j,dist);
+          }
         }
       }
 
@@ -609,9 +609,20 @@ vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
   }
 }
 
+void Lista::Approx2(){
+  vector<int> mst = PrimMST();
+  Lista mstGraph = Lista(m_savePath + "/Prim.txt");
+
+  ofstream myOut;
+  myOut.open (m_savePath + "/Approx2.txt");
+  for (int i = 1; i < mst.size(); ++i){
+    myOut << mst[i] << endl;
+  }
+
+}
 //Função que escreve no arquivo de saída o peso total de uma MST do grafo,
 //junto com o numero de vértices e as arestas pertencentes a essa árvore
-void Lista::PrimMST(){
+vector<int> Lista::PrimMST(){
   clock_t begin = clock();
   //Inicializa o vértice 0 como nossa raiz
   int s = 0;
@@ -675,7 +686,7 @@ void Lista::PrimMST(){
   }
 
   //Escrita no arquivo de saída
-  myOut << "Peso total: " << pesoTotal << endl;
+  //myOut << "Peso total: " << pesoTotal << endl;
   myOut << m_numVertices << endl;
   for (int i = 1; i < m_numVertices; ++i){
     myOut << pai[i] + 1 << " " << i + 1 << endl;
@@ -683,6 +694,7 @@ void Lista::PrimMST(){
   clock_t	end = clock();
 	double elapsed_time = double(end-begin)/CLOCKS_PER_SEC;
 	cout << "-------------------" << endl << "TOTAL elapsed time: " << elapsed_time << "s" << endl;
+  return pai;
 }
 
 //Função que retorna a excentricidade de um vértice v

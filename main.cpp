@@ -34,7 +34,8 @@ int main(){
     cout << "9: Excentricidade de um vertice" << endl;
     cout << "10: Distancia media" << endl;
     cout << "11: Tempo medio Excentricidade (Estudo de caso)" << endl;
-    cout << "12: Sair" << endl;
+    cout << "12: 2-Approximation" << endl;
+    cout << "13: Sair" << endl;
     cin >> opcao;
     system("CLS");
     switch(opcao){
@@ -130,7 +131,7 @@ int main(){
         lista.distMedia();
         break;
       case 11:
-        double tempototal = 0;
+        {double tempototal = 0;
         int count = 0;
         for (int i = 0; i < 100; i++){
           int a = rand() % lista.m_numVertices + 1;
@@ -141,10 +142,13 @@ int main(){
           tempototal += tempo;
           count++;
         }
-       cout << count << endl;
-       cout << tempototal << endl;
-       cout << tempototal/count << endl;
-       break;
+        cout << count << endl;
+        cout << tempototal << endl;
+        cout << tempototal/count << endl;}
+        break;
+      case 12:
+        lista.Approx2();
+        break;
     }
   }
 

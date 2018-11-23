@@ -20,9 +20,10 @@ class Lista : public Grafo{
         vector<float> distDijkstra(int raiz);
         float caminhoMinimo(int x, int y);
         vector<int> retornaCaminho(vector<int> pai, int raiz, int v);
-        void PrimMST();
+        vector<int> PrimMST();
         float excentricidade(int v);
         float distMedia();
+        void Approx2();
         bool grafoNegativo = 0;
         bool grafoComPeso = 0;
         bool grafoEuclid = 1;
