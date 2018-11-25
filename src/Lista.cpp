@@ -134,6 +134,33 @@ vector<tuple<int, float> > Lista::vizinhos(int v){
   return vizinhos;
 }
 
+
+int Lista::pesoAresta(int v1, int v2){
+  int peso = 0;
+
+  vector<tuple<int, float> > w = vizinhos(v1);
+
+  for(int q = 0;q<w.size();q++){
+    if (get<0>(w[q]) == v2){
+      peso += get<1>(w[q]);
+    }
+  }
+  return peso;
+
+  // ListInfo* pCrawl = new ListInfo;
+  // pCrawl = m_pLista[v1-1];
+  //
+  // while(pCrawl != NULL){
+  //   if (pCrawl->vertice = v2-1){
+  //     peso = pCrawl->peso;
+  //     return peso;
+  //   }
+  //   pCrawl = pCrawl->pNext;
+  // }
+  // return -1;
+}
+
+
 //Retorna o struct BFSs, que contém o vetor de explorados, de pais e de niveis
 BFSs* Lista::BFS(int raiz) {
 
@@ -647,18 +674,27 @@ vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
 }
 
 void Lista::Approx2(){
+  int peso = 0;
   grafoEuclid = 0;
   vector<int> mst = PrimMST();
   Lista mstGraph = Lista(m_savePath + "/Prim.txt");
   //grafoEuclid = 1;
-  vector<int> caminho = mstGraph.DFScaminho(1); //N FUNCIONA
+  vector<int> caminho = mstGraph.DFScaminho(1);
   caminho.push_back(caminho[0]);
+
+  for(int i = 0;i<caminho.size()-1;i++){
+    peso += pesoAresta(caminho[i],caminho[i+1]+1);
+    cout << "par: " << caminho[i]+1 << caminho[i+1]+1 << " peso: " << pesoAresta(caminho[i],caminho[i+1]+1) << endl;
+  }
+
   ofstream myOut;
   myOut.open (m_savePath + "/Approx2.txt");
   for (int i = 0; i < caminho.size(); ++i){
-    myOut << caminho[i] << endl;
-    cout << caminho[i] << endl;
+    myOut << caminho[i]+1 << endl;
+    cout << caminho[i]+1 << endl;
   }
+  myOut << "Peso Total: " << peso << endl;
+  cout << "Peso Total: " << peso << endl;
 }
 //Função que escreve no arquivo de saída o peso total de uma MST do grafo,
 //junto com o numero de vértices e as arestas pertencentes a essa árvore

@@ -24,6 +24,7 @@ class Lista : public Grafo{
         float excentricidade(int v);
         float distMedia();
         void Approx2();
+        int pesoAresta(int v1, int v2);
         bool grafoNegativo = 0;
         bool grafoComPeso = 0;
         bool grafoEuclid;
