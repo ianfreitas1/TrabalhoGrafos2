@@ -22,7 +22,7 @@ int main(){
   //matriz.vizinhos(1);
   Lista lista = Lista(arquivo);
   int opcao = 1;
-  while (opcao < 12 && opcao > 0){
+  while (opcao < 13 && opcao > 0){
     cout << "1: Grau" << endl;
     cout << "2: BFS" << endl;
     cout << "3: DFS" << endl;

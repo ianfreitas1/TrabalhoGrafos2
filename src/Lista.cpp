@@ -311,6 +311,34 @@ vector<bool> Lista::DFS(int raiz) {
 	return visitado;
 }
 
+vector<int> Lista::DFScaminho(int raiz) {       //Funcao que é usada pra retornar pre-order NAO FUNCIONA AINDA
+	int s = raiz-1;
+	vector<bool> visitado(m_numVertices,0);
+	vector<int> pai(m_numVertices,-1);
+	vector<int> nivel(m_numVertices,-1);
+	stack<int> pilha;
+  vector<int> caminho;
+
+	nivel[s] = 0;
+	pilha.push(s);
+
+	while(!pilha.empty()) {
+		int v = pilha.top();
+    caminho.push_back(v );                      //Essa variavel caminho que retorna no final
+		pilha.pop();
+    if (visitado[v]==0){
+      visitado[v]=1;
+      vector<tuple<int, float> > w = vizinhos(v);
+      for(unsigned int i = 0; i < w.size();i++){
+        pilha.push(get<0>(w[i])-1);
+          int n = pilha.top();
+          pai[n] = v;
+          nivel[n] = nivel[v] + 1;
+        }
+      }
+    }
+	return caminho;
+}
 
 //Funcao para achar as componentes conexas de um grafo.
 void Lista::CC(){
@@ -611,14 +639,23 @@ vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
 
 void Lista::Approx2(){
   vector<int> mst = PrimMST();
+  grafoEuclid = 0;
   Lista mstGraph = Lista(m_savePath + "/Prim.txt");
+  grafoEuclid = 1;
+  vector<int> caminho = mstGraph.DFScaminho(1); //N FUNCIONA
+
+  set<int> s( caminho.begin(), caminho.end() );
+  caminho.assign( s.begin(), s.end() );                                     //Como "caminho" é a pilha até agora, tá retornandp
+                                                                            //Só os valores de 0-n como aparecem na pilha
+
+  caminho.push_back(caminho[0]); //fecha o ciclo
 
   ofstream myOut;
   myOut.open (m_savePath + "/Approx2.txt");
-  for (int i = 1; i < mst.size(); ++i){
-    myOut << mst[i] << endl;
+  for (int i = 0; i < caminho.size(); ++i){
+    myOut << caminho[i] << endl;
+    cout << caminho[i] << endl;
   }
-
 }
 //Função que escreve no arquivo de saída o peso total de uma MST do grafo,
 //junto com o numero de vértices e as arestas pertencentes a essa árvore
