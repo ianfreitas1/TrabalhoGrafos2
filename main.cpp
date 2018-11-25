@@ -22,7 +22,7 @@ int main(){
   //matriz.vizinhos(1);
   Lista lista = Lista(arquivo);
   int opcao = 1;
-  while (opcao < 13 && opcao > 0){
+  while (opcao < 14 && opcao > 0){
     cout << "1: Grau" << endl;
     cout << "2: BFS" << endl;
     cout << "3: DFS" << endl;
@@ -35,6 +35,7 @@ int main(){
     cout << "10: Distancia media" << endl;
     cout << "11: Tempo medio Excentricidade (Estudo de caso)" << endl;
     cout << "12: 2-Approximation" << endl;
+    cout << "13: DFS Caminho" << endl;
     cout << "13: Sair" << endl;
     cin >> opcao;
     system("CLS");
@@ -148,6 +149,9 @@ int main(){
         break;
       case 12:
         lista.Approx2();
+        break;
+      case 13:
+        lista.DFScaminho(1);
         break;
     }
   }

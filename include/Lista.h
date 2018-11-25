@@ -26,8 +26,9 @@ class Lista : public Grafo{
         void Approx2();
         bool grafoNegativo = 0;
         bool grafoComPeso = 0;
-        bool grafoEuclid = 1;
+        bool grafoEuclid;
         vector<float> distMedia_Dijkstra(int raiz);
+        vector<int> DFScaminho(int raiz);
       //  ListInfo** getLista();
 
     protected:

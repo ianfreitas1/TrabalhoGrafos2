@@ -26,7 +26,8 @@ Lista::Lista(string path){
   if(!myFile){
     cout << "Location not Found";
   }
-
+  cout << "O grafo e o do trabalho 3?" << endl;
+  cin >> grafoEuclid;
   if (grafoEuclid == 1) {
       myFile >> m_numVertices;
       m_pLista = new ListInfo*[m_numVertices+1]();
@@ -44,19 +45,18 @@ Lista::Lista(string path){
         aux++;
       }
       float dist;
-      for (int i = 1;i<m_numVertices+1;i++){
-        for (int j = 1;j<m_numVertices+1;j++){
-          if (i != j+1){
+      for (int i = 1;i<=m_numVertices;i++){
+        for (int j = 1;j<=m_numVertices;j++){
+          if (i != j){
             float x_d = vectorPos[i][0] - vectorPos[j][0];
             float y_d = vectorPos[i][1] - vectorPos[j][1];
             dist = pow(x_d, 2) + pow(y_d, 2);       //calculating Euclidean distance
             dist = sqrt(dist);
-            //cout << "par: " << i << "," << j << "dist: " <<dist << endl;
+            cout << "par: " << i << "," << j << "dist: " <<dist << endl;
             this->addAresta(i,j,dist);
           }
         }
       }
-
     }else{
 
       //Recebe a primeira linha do arquivo e guarda na variavel numero de vertices
@@ -273,6 +273,7 @@ vector<bool> Lista::DFS(int raiz) {
 	vector<int> pai(m_numVertices,-1);
 	vector<int> nivel(m_numVertices,-1);
 	stack<int> pilha;
+  vector<int> caminho;
 
   //Inicio do arquivo de saída
   ofstream myOut;
@@ -295,10 +296,11 @@ vector<bool> Lista::DFS(int raiz) {
 		int v = pilha.top();
 		pilha.pop();
     if (visitado[v]==0){
+      caminho.push_back(v);
       myOut << "Vertice: " << v << ", Nivel: " << nivel[v] << ", Pai: " << pai[v] << endl;
       visitado[v]=1;
       vector<tuple<int, float> > w = vizinhos(v);
-      for(unsigned int i = 0; i < w.size();i++){
+      for(int i = 0; i < w.size();i++){
         pilha.push(get<0>(w[i])-1);
           int n = pilha.top();
           pai[n] = v;
@@ -306,7 +308,9 @@ vector<bool> Lista::DFS(int raiz) {
         }
       }
     }
-
+  for (int i = 0; i < caminho.size(); i++){
+    cout << caminho[i] << endl;
+  }
   //Retorno do vetor visitados
 	return visitado;
 }
@@ -314,6 +318,7 @@ vector<bool> Lista::DFS(int raiz) {
 vector<int> Lista::DFScaminho(int raiz) {       //Funcao que é usada pra retornar pre-order NAO FUNCIONA AINDA
 	int s = raiz-1;
 	vector<bool> visitado(m_numVertices,0);
+  //vector<bool> inCaminho(m_numVertices, 0);
 	vector<int> pai(m_numVertices,-1);
 	vector<int> nivel(m_numVertices,-1);
 	stack<int> pilha;
@@ -324,9 +329,10 @@ vector<int> Lista::DFScaminho(int raiz) {       //Funcao que é usada pra retorn
 
 	while(!pilha.empty()) {
 		int v = pilha.top();
-    caminho.push_back(v );                      //Essa variavel caminho que retorna no final
+    //caminho.push_back(v);         //Essa variavel caminho que retorna no final
 		pilha.pop();
     if (visitado[v]==0){
+      caminho.push_back(v);         //Essa variavel caminho que retorna no final
       visitado[v]=1;
       vector<tuple<int, float> > w = vizinhos(v);
       for(unsigned int i = 0; i < w.size();i++){
@@ -337,6 +343,9 @@ vector<int> Lista::DFScaminho(int raiz) {       //Funcao que é usada pra retorn
         }
       }
     }
+  // for (int i = 0; i < caminho.size(); i++){
+  //   cout << caminho[i] << endl;
+  // }
 	return caminho;
 }
 
@@ -638,18 +647,12 @@ vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
 }
 
 void Lista::Approx2(){
-  vector<int> mst = PrimMST();
   grafoEuclid = 0;
+  vector<int> mst = PrimMST();
   Lista mstGraph = Lista(m_savePath + "/Prim.txt");
-  grafoEuclid = 1;
+  //grafoEuclid = 1;
   vector<int> caminho = mstGraph.DFScaminho(1); //N FUNCIONA
-
-  set<int> s( caminho.begin(), caminho.end() );
-  caminho.assign( s.begin(), s.end() );                                     //Como "caminho" é a pilha até agora, tá retornandp
-                                                                            //Só os valores de 0-n como aparecem na pilha
-
-  caminho.push_back(caminho[0]); //fecha o ciclo
-
+  caminho.push_back(caminho[0]);
   ofstream myOut;
   myOut.open (m_savePath + "/Approx2.txt");
   for (int i = 0; i < caminho.size(); ++i){
