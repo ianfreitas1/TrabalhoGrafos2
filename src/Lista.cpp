@@ -26,7 +26,7 @@ Lista::Lista(string path){
   if(!myFile){
     cout << "Location not Found";
   }
-  cout << "O grafo e o do trabalho 3?" << endl;
+  cout << "Grafo Euclideano?" << endl;
   cin >> grafoEuclid;
   if (grafoEuclid == 1) {
       myFile >> m_numVertices;
@@ -52,7 +52,7 @@ Lista::Lista(string path){
             float y_d = vectorPos[i][1] - vectorPos[j][1];
             dist = pow(x_d, 2) + pow(y_d, 2);       //calculating Euclidean distance
             dist = sqrt(dist);
-            cout << "par: " << i << "," << j << "dist: " <<dist << endl;
+            //cout << "par: " << i << "," << j << "dist: " <<dist << endl;
             this->addAresta(i,j,dist);
           }
         }
@@ -134,30 +134,16 @@ vector<tuple<int, float> > Lista::vizinhos(int v){
   return vizinhos;
 }
 
-
+//Retorna o peso da aresta entre v1 e v2
 int Lista::pesoAresta(int v1, int v2){
   int peso = 0;
-
   vector<tuple<int, float> > w = vizinhos(v1);
-
   for(int q = 0;q<w.size();q++){
     if (get<0>(w[q]) == v2){
       peso += get<1>(w[q]);
     }
   }
   return peso;
-
-  // ListInfo* pCrawl = new ListInfo;
-  // pCrawl = m_pLista[v1-1];
-  //
-  // while(pCrawl != NULL){
-  //   if (pCrawl->vertice = v2-1){
-  //     peso = pCrawl->peso;
-  //     return peso;
-  //   }
-  //   pCrawl = pCrawl->pNext;
-  // }
-  // return -1;
 }
 
 
@@ -342,10 +328,10 @@ vector<bool> Lista::DFS(int raiz) {
 	return visitado;
 }
 
-vector<int> Lista::DFScaminho(int raiz) {       //Funcao que é usada pra retornar pre-order NAO FUNCIONA AINDA
+//Usada no Approx2, DFS que retorna a ordem que foram visitados
+vector<int> Lista::DFScaminho(int raiz) {
 	int s = raiz-1;
 	vector<bool> visitado(m_numVertices,0);
-  //vector<bool> inCaminho(m_numVertices, 0);
 	vector<int> pai(m_numVertices,-1);
 	vector<int> nivel(m_numVertices,-1);
 	stack<int> pilha;
@@ -356,7 +342,6 @@ vector<int> Lista::DFScaminho(int raiz) {       //Funcao que é usada pra retorn
 
 	while(!pilha.empty()) {
 		int v = pilha.top();
-    //caminho.push_back(v);         //Essa variavel caminho que retorna no final
 		pilha.pop();
     if (visitado[v]==0){
       caminho.push_back(v);         //Essa variavel caminho que retorna no final
@@ -370,9 +355,6 @@ vector<int> Lista::DFScaminho(int raiz) {       //Funcao que é usada pra retorn
         }
       }
     }
-  // for (int i = 0; i < caminho.size(); i++){
-  //   cout << caminho[i] << endl;
-  // }
 	return caminho;
 }
 
@@ -673,22 +655,24 @@ vector<int> Lista::retornaCaminho(vector<int> pai, int raiz, int v){
   }
 }
 
+//Aproximador do problema do Caixeiro-viajante, custo do resultado < 2*caminho ótimo
 void Lista::Approx2(){
   int peso = 0;
-  grafoEuclid = 0;
-  vector<int> mst = PrimMST();
-  Lista mstGraph = Lista(m_savePath + "/Prim.txt");
-  //grafoEuclid = 1;
-  vector<int> caminho = mstGraph.DFScaminho(1);
-  caminho.push_back(caminho[0]);
 
-  for(int i = 0;i<caminho.size()-1;i++){
+  vector<int> mst = PrimMST();                                  //Cria a MST e lê como grafo
+  Lista mstGraph = Lista(m_savePath + "/Prim.txt");
+
+  vector<int> caminho = mstGraph.DFScaminho(2);                 //Roda a DFS que retorna a pre-Order
+
+  caminho.push_back(caminho[0]);                                //Completa o ciclo
+
+  for(int i = 0;i<caminho.size()-1;i++){                        //Calcula Pesototal do caminho
     peso += pesoAresta(caminho[i],caminho[i+1]+1);
-    cout << "par: " << caminho[i]+1 << caminho[i+1]+1 << " peso: " << pesoAresta(caminho[i],caminho[i+1]+1) << endl;
+    //cout << "par: " << caminho[i]+1 << " " <<caminho[i+1]+1 << " peso: " << pesoAresta(caminho[i],caminho[i+1]+1) << endl;
   }
 
   ofstream myOut;
-  myOut.open (m_savePath + "/Approx2.txt");
+  myOut.open (m_savePath + "/Approx2.txt");                       //Output
   for (int i = 0; i < caminho.size(); ++i){
     myOut << caminho[i]+1 << endl;
     cout << caminho[i]+1 << endl;
@@ -696,6 +680,7 @@ void Lista::Approx2(){
   myOut << "Peso Total: " << peso << endl;
   cout << "Peso Total: " << peso << endl;
 }
+
 //Função que escreve no arquivo de saída o peso total de uma MST do grafo,
 //junto com o numero de vértices e as arestas pertencentes a essa árvore
 vector<int> Lista::PrimMST(){
